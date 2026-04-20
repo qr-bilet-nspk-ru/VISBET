@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Линия события | VisBET</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Скелетоны и анимация */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 10px;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .event-main-info {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .teams-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .team-logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            object-fit: contain;
+        }
+
+        .vs-divider {
+            font-size: 24px;
+            font-weight: 900;
+            opacity: 0.3;
+            font-style: italic;
+        }
+
+        .event-teams-large {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .market-section { margin-bottom: 25px; }
+        .market-name {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--turquoise);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--turquoise);
+            padding-left: 10px;
+        }
+
+        .outcomes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .odd-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .odd-item:hover {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: var(--turquoise);
+            transform: translateY(-2px);
+        }
+
+        .odd-item.selected {
+            background: var(--turquoise);
+            border-color: var(--turquoise);
+        }
+        .odd-item.selected span { color: #000 !important; }
+
+        .conflict-msg { 
+            color: #ff4d4d; font-size: 11px; text-align: center; 
+            margin-bottom: 10px; font-weight: bold; display: none; 
+            background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
+        <div id="auth-zone" class="user-info"></div>
+    </header>
+
+    <div class="main-layout" style="display: flex; gap: 25px; padding: 20px; max-width: 1400px; margin: 0 auto;">
+        
+        <aside class="sidebar" style="flex: 0.8;">
+            <button class="glass" onclick="location.href='index.html'" style="width: 100%; padding: 12px; color: #fff; border-radius: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
+                ← К линии
+            </button>
+        </aside>
+
+        <section class="content-area" style="flex: 3;">
+            <div id="event-details-container">
+                <div class="event-main-info skeleton" style="height: 250px;"></div>
+                <div class="skeleton" style="height: 30px; width: 200px; margin-bottom: 20px;"></div>
+                <div class="outcomes-grid">
+                    <div class="skeleton" style="height: 60px;"></div>
+                    <div class="skeleton" style="height: 60px;"></div>
+                    <div class="skeleton" style="height: 60px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <aside id="rightCoupon" class="coupon-area" style="flex: 1.2;">
+            <div class="coupon-card glass" style="position: sticky; top: 20px;">
+                <div class="coupon-header">
+                    <span class="bet-type-badge" id="bet-type">Ординар</span>
+                    <span style="font-size: 14px; font-weight: 700;">КУПОН</span>
+                </div>
+                <div id="slip-items"></div>
+                <div id="slip-footer" style="display: none; margin-top: 20px;">
+                    <div id="conflict-warning" class="conflict-msg">Маркеты из одного матча нельзя в экспресс</div>
+                    <div class="coupon-summary">
+                        <input type="number" id="stakeAmount" placeholder="Сумма (₽)" oninput="updateWin()" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px; opacity: 0.7;">
+                            <span>Общий Кф:</span><span id="summary-odd" style="color: var(--turquoise); font-weight: 800;">1.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 18px;">
+                            <span>К выплате:</span><span id="winAmount" style="color: #00ff88; font-weight: 900;">0 ₽</span>
+                        </div>
+                    </div>
+                    <button class="btn-submit-bet" id="btn-place-bet" onclick="placeOrder()" style="width: 100%; margin-top: 15px; padding: 15px; border-radius: 12px; border: none; background: var(--turquoise); color: #000; font-weight: bold; cursor: pointer;">Сделать ставку</button>
+                    <button onclick="clearSlip()" style="background:none; border:none; color:#ff4d4d; width:100%; margin-top:10px; cursor:pointer; font-size:11px; opacity: 0.5;">Очистить купон</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
+            authDomain: "visbet-b4fa1.firebaseapp.com",
+            projectId: "visbet-b4fa1",
+            storageBucket: "visbet-b4fa1.firebasestorage.app",
+            messagingSenderId: "551263525115",
+            appId: "1:551263525115:web:05265f14a1f1e77d48f85e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.fb = { doc, getDoc, setDoc, updateDoc, onSnapshot };
+
+        startPage();
+    </script>
+
+    <script>
+        let currentEvent = null;
+        let currentUser = null;
+
+        const getSlip = () => JSON.parse(localStorage.getItem('visbet_slip') || '[]');
+        const saveSlip = (data) => { 
+            localStorage.setItem('visbet_slip', JSON.stringify(data)); 
+            renderSlip();
+            renderEventDetails(); // Перерисовываем, чтобы подсветить выбранные кнопки
+        };
+
+        async function startPage() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) return location.href = 'index.html';
+
+            initUser();
+            renderSlip();
+
+            // Загрузка матча
+            const docRef = window.fb.doc(window.db, "events", id);
+            const snap = await window.fb.getDoc(docRef);
+
+            if (snap.exists()) {
+                currentEvent = { id: snap.id, ...snap.data() };
+                setTimeout(() => renderEventDetails(), 600); // Небольшая задержка для красоты скелетона
+            } else {
+                document.getElementById('event-details-container').innerHTML = "Событие не найдено.";
+            }
+        }
+
+        function initUser() {
+            const uid = localStorage.getItem('visbet_user');
+            if(!uid) return;
+            
+            window.fb.onSnapshot(window.fb.doc(window.db, "users", uid.trim()), (doc) => {
+                if(doc.exists()) {
+                    currentUser = doc.data();
+                    document.getElementById('auth-zone').innerHTML = `
+                        <div class="balance">${Math.round(currentUser.balance).toLocaleString()} ₽</div>
+                        <div class="username" style="margin-left:10px; opacity:0.5;">${currentUser.username}</div>
+                    `;
+                }
+            });
+        }
+
+        function renderEventDetails() {
+            if(!currentEvent) return;
+            const slip = getSlip();
+            const container = document.getElementById('event-details-container');
+            
+            // Генерация ссылок на логотипы (используем инициалы команд)
+            const getLogo = (name) => `https://api.dicebear.com/7.x/initials/svg?seed=${name}&backgroundColor=00f2ff,0072ff&fontSize=40`;
+
+            container.innerHTML = `
+                <div class="event-main-info">
+                    <div style="opacity: 0.5; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">
+                        ${currentEvent.sport} — ${currentEvent.league}
+                    </div>
+                    
+                    <div class="teams-display">
+                        <img src="${getLogo(currentEvent.teams.home)}" class="team-logo">
+                        <div class="vs-divider">VS</div>
+                        <img src="${getLogo(currentEvent.teams.away)}" class="team-logo">
+                    </div>
+
+                    <div class="event-teams-large">${currentEvent.teams.home} — ${currentEvent.teams.away}</div>
+                    <div style="opacity: 0.6; margin-top: 10px;">${currentEvent.date} в ${currentEvent.time}</div>
+                </div>
+                
+                ${currentEvent.markets.map(market => `
+                    <div class="market-section">
+                        <span class="market-name">${market.name}</span>
+                        <div class="outcomes-grid">
+                            ${market.outcomes.map(out => {
+                                const isSelected = slip.some(s => s.id === currentEvent.id && s.pick === out.name && s.market === market.name);
+                                return `
+                                    <div class="odd-item ${isSelected ? 'selected' : ''}" 
+                                         onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')">
+                                        <span class="odd-label" style="font-weight: 600; font-size: 14px;">${out.name}</span>
+                                        <span class="odd-val">${out.odd}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        window.addToSlip = (id, team, pick, odd, market) => {
+            let slip = getSlip();
+            const idx = slip.findIndex(i => i.id === id && i.pick === pick && i.market === market);
+            
+            if(idx > -1) {
+                slip.splice(idx, 1); // Если уже есть - убираем (toggle)
+            } else {
+                slip.push({id, team, pick, odd, market});
+            }
+            saveSlip(slip);
+        };
+
+        function renderSlip() {
+            const slip = getSlip();
+            const container = document.getElementById('slip-items');
+            const footer = document.getElementById('slip-footer');
+            const warn = document.getElementById('conflict-warning');
+            const btn = document.getElementById('btn-place-bet');
+
+            if (slip.length === 0) {
+                container.innerHTML = `<p style="text-align:center; padding:30px; opacity:0.3; font-size:12px;">Выберите исход для пари</p>`;
+                footer.style.display = 'none';
+                return;
+            }
+
+            // Конфликт: нельзя брать несколько исходов одного матча в экспресс
+            let hasConflict = false;
+            const seenMatches = {};
+            slip.forEach(item => {
+                if(seenMatches[item.id]) hasConflict = true;
+                seenMatches[item.id] = true;
+            });
+
+            container.innerHTML = slip.map((item, idx) => `
+                <div class="glass" style="padding:12px; border-radius:10px; margin-bottom:8px; border-left: 4px solid var(--turquoise);">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; margin-bottom:5px;">
+                        <span>${item.team}</span>
+                        <span onclick="removeFromSlip(${idx})" style="color:#ff4d4d; cursor:pointer; font-size:18px;">&times;</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:11px;">
+                        <span style="opacity:0.6;">${item.market}: <b>${item.pick}</b></span>
+                        <span style="color:var(--turquoise); font-weight:bold;">${item.odd}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            footer.style.display = 'block';
+            warn.style.display = (slip.length > 1 && hasConflict) ? 'block' : 'none';
+            btn.disabled = (slip.length > 1 && hasConflict);
+            btn.style.opacity = btn.disabled ? '0.3' : '1';
+
+            const totalOdd = slip.reduce((acc, i) => acc * i.odd, 1).toFixed(2);
+            document.getElementById('summary-odd').innerText = totalOdd;
+            document.getElementById('bet-type').innerText = slip.length > 1 ? "Экспресс" : "Ординар";
+            updateWin();
+        }
+
+        window.removeFromSlip = (idx) => { let s = getSlip(); s.splice(idx, 1); saveSlip(s); };
+        window.clearSlip = () => saveSlip([]);
+        
+        window.updateWin = () => {
+            const amt = document.getElementById('stakeAmount').value || 0;
+            const odd = parseFloat(document.getElementById('summary-odd').innerText);
+            document.getElementById('winAmount').innerText = Math.floor(amt * odd).toLocaleString() + " ₽";
+        };
+
+        window.placeOrder = async () => {
+            if(!currentUser) return alert("Пожалуйста, войдите в аккаунт");
+            const slip = getSlip();
+            const amount = Math.floor(document.getElementById('stakeAmount').value);
+            
+            if(!amount || amount < 10) return alert("Минимальная ставка 10 ₽");
+            if(amount > currentUser.balance) return alert("Недостаточно средств");
+
+            const bet = {
+                userId: currentUser.username,
+                amount: amount,
+                totalOdd: parseFloat(document.getElementById('summary-odd').innerText),
+                items: slip,
+                status: "В игре",
+                date: new Date().toLocaleString(),
+                timestamp: Date.now()
+            };
+
+            try {
+                await window.fb.setDoc(window.fb.doc(window.db, "bets", "bet_" + Date.now()), bet);
+                await window.fb.updateDoc(window.fb.doc(window.db, "users", currentUser.username), {
+                    balance: currentUser.balance - amount
+                });
+                saveSlip([]);
+                alert("Пари успешно принято!");
+                location.href = 'index.html';
+            } catch(e) {
+                alert("Ошибка соединения с сервером");
+            }
+        };
+
+        window.addEventListener('storage', () => { renderSlip(); renderEventDetails(); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+/* VisBET - Professional Betting Platform Stylesheet
+   Theme: Midnight Glass (Turquoise & Dark Grey)
+*/
+
+:root {
+    --bg-black: #0b0e11;
+    --dark-card: #161a1e;
+    --turquoise: #00f2ea;
+    --turquoise-hover: #00d1ca;
+    --turquoise-glow: rgba(0, 242, 234, 0.3);
+    --turquoise-alpha: rgba(0, 242, 234, 0.1);
+    --white: #ffffff;
+    --text-muted: #8e9194;
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --danger: #ff4d4d;
+    --success: #00c853;
+}
+
+/* --- Базовые настройки --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-black);
+    background: radial-gradient(circle at 50% -20%, #003a38 0%, #0b0e11 100%);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Стилизация скроллбара */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--turquoise); }
+
+/* --- Основная сетка (Layout) --- */
+.header {
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr 340px;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1700px;
+    margin: 0 auto;
+}
+
+/* --- Компоненты Glassmorphism --- */
+.glass {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+}
+
+/* --- Логотип и Навигация --- */
+.logo { 
+    font-size: 26px; 
+    font-weight: 900; 
+    letter-spacing: 2px; 
+    text-transform: uppercase;
+}
+.logo span { 
+    color: var(--turquoise); 
+    text-shadow: 0 0 15px var(--turquoise-glow); 
+}
+
+.nav-link {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 8px;
+}
+.nav-link.active, .nav-link:hover { 
+    color: var(--turquoise); 
+    background: var(--turquoise-alpha);
+}
+
+/* --- Боковое меню (Sidebar) --- */
+.sidebar { padding: 20px; height: fit-content; }
+.sidebar h3 { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    margin-bottom: 15px; 
+    letter-spacing: 1px;
+}
+.sidebar ul { list-style: none; }
+.sidebar li {
+    padding: 12px 15px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #dfdfdf;
+    font-size: 14px;
+}
+.sidebar li:hover, .sidebar li.active {
+    background: var(--turquoise-alpha);
+    color: var(--turquoise);
+    box-shadow: inset -3px 0 0 var(--turquoise);
+}
+
+/* --- Карточки матчей (Линия) --- */
+.match-card {
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: 0.3s ease;
+}
+.match-card:hover { 
+    border-color: var(--turquoise-glow);
+    transform: translateY(-2px);
+}
+
+.match-header { 
+    font-size: 12px; 
+    color: var(--text-muted); 
+    margin-bottom: 10px; 
+}
+.match-teams { 
+    font-size: 18px; 
+    font-weight: 700; 
+    margin-bottom: 20px; 
+    color: var(--white);
+}
+
+/* Кнопки коэффициентов */
+.odds-row { display: flex; gap: 10px; }
+.odd-box {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    padding: 12px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+}
+.odd-box .label { font-size: 13px; color: #ccc; }
+.odd-box span, .odd-box .val { 
+    color: var(--turquoise); 
+    font-weight: 800; 
+}
+.odd-box:hover { 
+    border-color: var(--turquoise); 
+    background: var(--turquoise-alpha); 
+}
+
+.more-btn { 
+    max-width: 50px; 
+    justify-content: center; 
+    font-size: 18px; 
+    color: var(--turquoise);
+}
+
+/* --- Детальная роспись матча (Deep Markets) --- */
+.match-hero { 
+    padding: 40px; 
+    text-align: center; 
+    margin-bottom: 24px;
+    background: linear-gradient(180deg, rgba(0, 242, 234, 0.05) 0%, transparent 100%);
+}
+.team-big { font-size: 32px; font-weight: 800; }
+.vs { color: var(--turquoise); font-size: 20px; margin: 0 25px; font-style: italic; opacity: 0.7; }
+.match-time { color: var(--text-muted); margin-top: 10px; font-size: 14px; }
+
+.detailed-markets { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+}
+.market-block { padding: 20px; }
+.market-block h4 { 
+    font-size: 14px; 
+    color: var(--turquoise); 
+    margin-bottom: 15px; 
+    text-transform: uppercase;
+    border-left: 3px solid var(--turquoise);
+    padding-left: 10px;
+}
+.market-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+    gap: 10px; 
+}
+
+/* --- Купон (Betslip) --- */
+.coupon-card { 
+    padding: 20px; 
+    position: sticky; 
+    top: 94px; 
+    height: fit-content;
+}
+.coupon-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+}
+.bet-type-badge { 
+    background: var(--turquoise); 
+    color: #000; 
+    padding: 2px 10px; 
+    border-radius: 6px; 
+    font-size: 11px; 
+    font-weight: 800; 
+    text-transform: uppercase;
+}
+
+.coupon-item {
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--turquoise);
+    animation: slideIn 0.3s ease-out;
+}
+.ci-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+.ci-top button { 
+    background: none; 
+    border: none; 
+    color: var(--danger); 
+    cursor: pointer; 
+    font-size: 18px; 
+}
+.ci-bottom { 
+    display: flex; 
+    justify-content: space-between; 
+    font-weight: 700; 
+    font-size: 15px;
+}
+
+.coupon-summary { 
+    border-top: 1px solid var(--glass-border); 
+    padding-top: 15px; 
+    margin-top: 20px; 
+}
+.summary-row { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    font-size: 16px; 
+    font-weight: 700; 
+}
+
+#stakeAmount {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 15px;
+    font-size: 16px;
+    text-align: center;
+}
+#stakeAmount:focus { outline: none; border-color: var(--turquoise); }
+
+.btn-submit-bet {
+    width: 100%;
+    padding: 18px;
+    background: var(--turquoise);
+    border: none;
+    border-radius: 14px;
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.btn-submit-bet:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 25px var(--turquoise-glow); 
+    background: var(--white);
+}
+
+/* --- Вкладки и Видимость --- */
+.tab-view { display: none; }
+.tab-view.active { display: block; }
+
+/* --- История ставок --- */
+.history-item { padding: 20px; margin-bottom: 16px; }
+.hi-header { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 12px; 
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+.status-badge { 
+    background: var(--turquoise-alpha); 
+    color: var(--turquoise); 
+    padding: 4px 12px; 
+    border-radius: 6px; 
+    font-weight: 700; 
+}
+.hi-details { 
+    font-size: 14px; 
+    margin: 15px 0; 
+    padding: 12px 0; 
+    border-top: 1px solid var(--glass-border); 
+    border-bottom: 1px solid var(--glass-border); 
+}
+.hi-footer { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* --- Модальные окна --- */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+.modal-content { 
+    width: 380px; 
+    padding: 40px; 
+    position: relative; 
+    text-align: center;
+}
+.modal-content input { 
+    width: 100%; 
+    padding: 14px; 
+    margin: 10px 0; 
+    background: #000; 
+    border: 1px solid var(--glass-border); 
+    color: white; 
+    border-radius: 10px; 
+}
+.btn-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #777;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* --- Панель пользователя (Шапка) --- */
+.user-info { display: flex; align-items: center; gap: 15px; }
+.balance { 
+    background: var(--turquoise-alpha); 
+    color: var(--turquoise); 
+    padding: 6px 14px; 
+    border-radius: 20px; 
+    font-weight: 800; 
+    border: 1px solid var(--turquoise);
+}
+.username { font-weight: 600; font-size: 14px; }
+.btn-logout { 
+    background: none; 
+    border: 1px solid var(--glass-border); 
+    color: var(--text-muted); 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+}
+
+/* --- Анимации --- */
+.animation-fade { animation: fadeIn 0.5s ease-out forwards; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Адаптивность для средних экранов */
+@media (max-width: 1200px) {
+    .main-layout {
+        grid-template-columns: 200px 1fr;
+    }
+    .coupon-area { display: none; } /* Скрываем купон на планшетах для упрощения */
+}
