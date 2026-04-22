@@ -1,6 +1,6 @@
-/**
- * VisBET - Main Application Script
- * Логика фильтрации, управления купоном и личного кабинета
+ /**
+ * VisBET - Main Application Script (Enhanced Edition)
+ * Включает Live-события, динамическую блокировку и Realtime-коэффициенты
  */
 
 let selectedOutcomes = []; // Выбранные ставки
@@ -11,25 +11,84 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEvents();
     checkAuth();
     
-    // Живой расчет суммы выигрыша при вводе суммы ставки
+    // Запуск Realtime-симуляции (изменение коэффициентов и статусов)
+    startRealtimeEngine();
+
     const stakeInput = document.getElementById('stakeAmount');
     if (stakeInput) {
         stakeInput.addEventListener('input', calculateWin);
     }
 });
 
-// --- 1. Навигация и Фильтры ---
+// --- 1. Realtime & Live Engine ---
+function startRealtimeEngine() {
+    setInterval(() => {
+        sportsData.forEach(match => {
+            // 1. Симуляция счета для LIVE матчей
+            if (match.isLive && Math.random() > 0.95) {
+                match.score.home += (Math.random() > 0.5 ? 1 : 0);
+                match.score.away += (Math.random() > 0.7 ? 1 : 0);
+            }
+
+            // 2. Симуляция изменения коэффициентов
+            match.markets.forEach(market => {
+                market.outcomes.forEach(o => {
+                    // Рандомное изменение кф на +/- 0.01-0.05
+                    if (Math.random() > 0.8) {
+                        const change = (Math.random() * 0.1 - 0.05);
+                        o.odd = Math.max(1.01, parseFloat((o.odd + change).toFixed(2)));
+                    }
+                });
+            });
+
+            // 3. Симуляция блокировки (Locked)
+            // Если в LIVE происходит опасный момент, блокируем ставки
+            if (match.isLive) {
+                match.isLocked = Math.random() > 0.9; 
+            }
+        });
+
+        // Частичное обновление интерфейса без полной перерисовки (если не открыты детали)
+        const detailsOpen = document.querySelector('.details-view');
+        if (!detailsOpen) {
+            renderEvents();
+        } else {
+            // Если открыты детали, можно обновлять только их (по желанию)
+            updateLiveIndicators(); 
+        }
+        
+        // Синхронизация купона, если коэффициенты изменились
+        syncCouponOdds();
+    }, 3000); // Обновление каждые 3 секунды
+}
+
+// Обновление кф в купоне, если они изменились в базе данных
+function syncCouponOdds() {
+    let changed = false;
+    selectedOutcomes.forEach(selected => {
+        const match = sportsData.find(m => m.id === selected.matchId);
+        if (match) {
+            match.markets.forEach(m => {
+                const actualOutcome = m.outcomes.find(o => o.label === selected.outcomeLabel);
+                if (actualOutcome && actualOutcome.odd !== selected.odd) {
+                    selected.odd = actualOutcome.odd;
+                    changed = true;
+                }
+            });
+        }
+    });
+    if (changed) updateCouponUI();
+}
+
+// --- 2. Навигация и Фильтры ---
 function switchTab(tabId, element = null) {
-    // Обновляем визуальный статус кнопок навигации (Верхнее меню)
     document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
     if (element) element.classList.add('active');
 
-    // Переключаем видимость контейнеров
     document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
     const targetView = document.getElementById(`${tabId}-view`);
     if (targetView) targetView.classList.add('active');
 
-    // Специфическая логика для разделов
     if (tabId === 'profile') renderHistory();
     if (tabId === 'line') {
         currentFilter = 'Все';
@@ -38,31 +97,21 @@ function switchTab(tabId, element = null) {
 }
 
 function filterSport(name) {
-    // 1. Приводим название к единому формату
     currentFilter = name.trim();
-    
-    // 2. Обновляем визуальный активный статус в меню
     const filterItems = document.querySelectorAll('#sportFilter li');
     filterItems.forEach(li => {
-        // Очищаем текст внутри li от лишних пробелов и переносов для сравнения
         const liText = li.innerText.replace(/\s+/g, ' ').trim();
-        
-        // Если текст совпадает или это кнопка "Все события"
         if (liText.includes(currentFilter) || (currentFilter === 'Все' && liText.includes('Все'))) {
             li.classList.add('active');
         } else {
             li.classList.remove('active');
         }
     });
-
-    // 3. Важно: сбрасываем вид на главную страницу линии
     switchTab('line');
-    
-    // 4. Перерисовываем события из актуальной базы данных
     renderEvents();
 }
 
-// --- 2. Рендеринг событий (Линия) ---
+// --- 3. Рендеринг событий ---
 function renderEvents() {
     const container = document.getElementById('eventsContainer');
     if (!container) return;
@@ -74,15 +123,17 @@ function renderEvents() {
 
     filtered.forEach(match => {
         const card = document.createElement('div');
-        card.className = 'match-card glass animation-fade';
+        card.className = `match-card glass animation-fade ${match.isLocked ? 'locked' : ''}`;
         
-        // Берем первый рынок (Основной исход) для отображения в ленте
         const previewMarket = match.markets[0];
+        const liveBadge = match.isLive ? `<span class="badge-live">LIVE ${match.score.home}:${match.score.away}</span>` : '';
+        const lockIcon = match.isLocked ? '<i class="fas fa-lock icon-lock"></i>' : '';
 
         card.innerHTML = `
             <div class="match-info-click" onclick="openMatchDetails(${match.id})" style="cursor:pointer">
                 <div class="match-header">
                     <span>${match.league} | ${match.date} ${match.time}</span>
+                    ${liveBadge}
                 </div>
                 <div class="match-teams">
                     ${match.teams.home} — ${match.teams.away}
@@ -91,8 +142,11 @@ function renderEvents() {
             <div class="match-markets">
                 <div class="market-row">
                     <div class="odds-row">
+                        ${match.isLocked ? '<div class="locked-overlay">Прием ставок приостановлен</div>' : ''}
                         ${previewMarket.outcomes.map(o => `
-                            <button class="odd-box" onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
+                            <button class="odd-box" 
+                                ${match.isLocked ? 'disabled' : ''} 
+                                onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
                                 <span class="label">${o.label}</span>
                                 <span class="val">${o.odd}</span>
                             </button>
@@ -106,7 +160,7 @@ function renderEvents() {
     });
 }
 
-// --- 3. Глубокая роспись матча (Deep Markets) ---
+// --- 4. Детальная роспись ---
 function openMatchDetails(matchId) {
     const match = sportsData.find(m => m.id === matchId);
     const container = document.getElementById('eventsContainer');
@@ -115,23 +169,25 @@ function openMatchDetails(matchId) {
         <div class="details-view animation-fade">
             <button class="btn-secondary" onclick="renderEvents()" style="margin-bottom:20px; cursor:pointer">← Назад к списку</button>
             
-            <div class="match-hero glass">
-                <div class="league-tag">${match.sport} | ${match.league}</div>
+            <div class="match-hero glass ${match.isLive ? 'live-hero' : ''}">
+                <div class="league-tag">${match.sport} | ${match.league} ${match.isLive ? '• LIVE' : ''}</div>
                 <div class="hero-teams">
                     <div class="team-big">${match.teams.home}</div>
-                    <div class="vs">VS</div>
+                    <div class="score-big">${match.isLive ? `${match.score.home} : ${match.score.away}` : 'VS'}</div>
                     <div class="team-big">${match.teams.away}</div>
                 </div>
-                <div class="match-time">Начало: ${match.date}, ${match.time}</div>
+                <div class="match-time">${match.isLive ? 'Матч в эфире' : 'Начало: ' + match.date + ', ' + match.time}</div>
             </div>
 
-            <div class="detailed-markets">
+            <div class="detailed-markets ${match.isLocked ? 'locked-section' : ''}">
                 ${match.markets.map(market => `
                     <div class="market-block glass">
-                        <h4>${market.name}</h4>
+                        <h4>${market.name} ${match.isLocked ? '🔒' : ''}</h4>
                         <div class="market-grid">
                             ${market.outcomes.map(o => `
-                                <button class="odd-box" onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
+                                <button class="odd-box" 
+                                    ${match.isLocked ? 'disabled' : ''} 
+                                    onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
                                     <span class="label">${o.label}</span>
                                     <span class="val">${o.odd}</span>
                                 </button>
@@ -145,11 +201,16 @@ function openMatchDetails(matchId) {
     window.scrollTo(0, 0);
 }
 
-// --- 4. Логика Купона ---
+// --- 5. Логика Купона ---
 function addToCoupon(matchId, matchName, outcomeLabel, odd) {
-    // Ограничение: нельзя ставить на разные исходы одного и того же матча в экспрессе
+    const match = sportsData.find(m => m.id === matchId);
+    if (match && match.isLocked) {
+        alert("Извините, прием ставок на это событие временно заблокирован.");
+        return;
+    }
+
     if (selectedOutcomes.some(item => item.matchId === matchId)) {
-        alert("Это событие уже добавлено в купон. Выберите другое для экспресса.");
+        alert("Это событие уже добавлено. Выберите другой матч для экспресса.");
         return;
     }
 
@@ -168,7 +229,7 @@ function updateCouponUI() {
     const typeBadge = document.getElementById('betType');
     
     if (selectedOutcomes.length === 0) {
-        list.innerHTML = '<div class="empty-coupon">Ваш купон пуст. Выберите коэффициент для начала игры.</div>';
+        list.innerHTML = '<div class="empty-coupon">Ваш купон пуст.</div>';
         oddsElem.innerText = '0.00';
         typeBadge.innerText = 'Ординар';
         calculateWin();
@@ -188,9 +249,7 @@ function updateCouponUI() {
         </div>
     `).join('');
 
-    // Коэффициент экспресса — произведение всех кф
     let totalOdd = selectedOutcomes.reduce((acc, curr) => acc * curr.odd, 1);
-    
     typeBadge.innerText = selectedOutcomes.length > 1 ? 'Экспресс' : 'Ординар';
     oddsElem.innerText = totalOdd.toFixed(2);
     calculateWin();
@@ -205,34 +264,41 @@ function calculateWin() {
     }
 }
 
-// --- 5. Заключение Пари (Фикс кнопки) ---
+// --- 6. Заключение Пари ---
 function confirmBet() {
     const session = JSON.parse(localStorage.getItem('visbet_session'));
     
     if (!session) {
-        alert("Для заключения пари необходимо войти в аккаунт.");
+        alert("Необходимо войти в аккаунт.");
         openModal('loginModal');
         return;
     }
 
-    if (selectedOutcomes.length === 0) {
-        alert("Сначала выберите событие.");
-        return;
-    }
+    if (selectedOutcomes.length === 0) return;
 
     const amount = parseFloat(document.getElementById('stakeAmount').value);
     if (!amount || amount < 10) {
-        alert("Минимальная сумма ставки — 10 ₽.");
+        alert("Минимальная ставка — 10 ₽.");
+        return;
+    }
+
+    // Проверка на Locked перед самой ставкой
+    const hasLocked = selectedOutcomes.some(item => {
+        const m = sportsData.find(sd => sd.id === item.matchId);
+        return m && m.isLocked;
+    });
+
+    if (hasLocked) {
+        alert("Одно или несколько событий в купоне заблокированы. Удалите их.");
         return;
     }
 
     if (amount > session.balance) {
-        alert("Недостаточно средств на балансе. Пожалуйста, пополните счет.");
+        alert("Недостаточно средств.");
         return;
     }
 
     const totalOdd = parseFloat(document.getElementById('finalOdds').innerText);
-    
     const betData = {
         id: Date.now(),
         type: selectedOutcomes.length > 1 ? 'Экспресс' : 'Ординар',
@@ -244,65 +310,42 @@ function confirmBet() {
         date: new Date().toLocaleString()
     };
 
-    // Вызов функции сохранения из auth.js
     saveBetToHistory(betData, amount);
+    alert(`Пари принято!`);
     
-    alert(`Пари принято! Желаем удачи!`);
-    
-    // Очистка купона
     selectedOutcomes = [];
     document.getElementById('stakeAmount').value = '';
     updateCouponUI();
-    
-    // Обновление интерфейса (баланс и история)
     checkAuth(); 
-    if (document.getElementById('profile-view').classList.contains('active')) {
-        renderHistory();
-    }
 }
 
-// --- 6. История ставок (Личный кабинет) ---
+// --- История и Модалки ---
 function renderHistory() {
     const session = JSON.parse(localStorage.getItem('visbet_session'));
     const container = document.getElementById('historyContainer');
-    if (!container) return;
+    if (!container || !session) return;
     
-    if (!session || !session.history || session.history.length === 0) {
-        container.innerHTML = `
-            <div class="glass" style="padding:40px; text-align:center; color:var(--text-muted)">
-                У вас пока нет активных или завершенных пари.
-            </div>
-        `;
+    if (!session.history || session.history.length === 0) {
+        container.innerHTML = `<div class="glass" style="padding:20px; text-align:center;">Истории пока нет.</div>`;
         return;
     }
 
     container.innerHTML = session.history.map(bet => `
         <div class="history-item glass animation-fade">
             <div class="hi-header">
-                <span>${bet.type} #${bet.id.toString().slice(-5)} | ${bet.date}</span>
+                <span>${bet.type} #${bet.id.toString().slice(-5)}</span>
                 <span class="status-badge">${bet.status}</span>
             </div>
             <div class="hi-details">
-                ${bet.events.map(e => `
-                    <div style="margin-bottom:5px">• ${e.matchName} — <b>${e.outcomeLabel}</b> (кф. ${e.odd})</div>
-                `).join('')}
+                ${bet.events.map(e => `<div>• ${e.matchName} — <b>${e.outcomeLabel}</b> (${e.odd})</div>`).join('')}
             </div>
             <div class="hi-footer">
-                <span>Ставка: <b>${bet.stake} ₽</b></span>
-                <span>Общий кф: <b>${bet.totalOdd.toFixed(2)}</b></span>
-                <span style="color:var(--turquoise)">Возможный выигрыш: <b>${bet.potentialWin} ₽</b></span>
+                <span>Ставка: ${bet.stake} ₽</span>
+                <span style="color:var(--turquoise)">Кф: ${bet.totalOdd.toFixed(2)}</span>
             </div>
         </div>
     `).join('');
 }
 
-// Утилиты для модалок
-function openModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) modal.style.display = 'flex';
-}
-
-function closeModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) modal.style.display = 'none';
-}
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
