@@ -109,6 +109,15 @@
             margin-bottom: 10px; font-weight: bold; display: none; 
             background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;
         }
+        .odds-change {
+            margin-top: 7px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(255, 170, 0, 0.12);
+            color: #ffcc66;
+            font-size: 11px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -146,7 +155,7 @@
                 </div>
                 <div id="slip-items"></div>
                 <div id="slip-footer" style="display: none; margin-top: 20px;">
-                    <div id="conflict-warning" class="conflict-msg">Маркеты из одного матча нельзя в экспресс</div>
+                    <div id="conflict-warning" class="conflict-msg">Несколько исходов одного рынка нельзя ставить вместе</div>
                     <div class="coupon-summary">
                         <input type="number" id="stakeAmount" placeholder="Сумма (₽)" oninput="updateWin()" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px; opacity: 0.7;">
@@ -165,7 +174,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
@@ -179,7 +188,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         window.db = db;
-        window.fb = { doc, getDoc, setDoc, updateDoc, onSnapshot };
+        window.fb = { doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction };
 
         startPage();
     </script>
@@ -187,6 +196,7 @@
     <script>
         let currentEvent = null;
         let currentUser = null;
+        let isPlacingBet = false;
 
         const getSlip = () => JSON.parse(localStorage.getItem('visbet_slip') || '[]');
         const saveSlip = (data) => { 
@@ -194,6 +204,68 @@
             renderSlip();
             renderEventDetails(); // Перерисовываем, чтобы подсветить выбранные кнопки
         };
+
+        function hasSlipConflict(slip) {
+            const seenMatches = {};
+            return slip.some(item => {
+                const key = `${item.id}::${item.market || 'market'}`;
+                const duplicate = Boolean(seenMatches[key]);
+                seenMatches[key] = true;
+                return duplicate;
+            });
+        }
+
+        function findFreshOddForSlipItem(item) {
+            if (!currentEvent || item.id !== currentEvent.id || !Array.isArray(currentEvent.markets)) return null;
+            const market = currentEvent.markets.find(m => m.name === item.market);
+            if (!market || !Array.isArray(market.outcomes)) return null;
+            const outcome = market.outcomes.find(out => (out.name || out.label) === item.pick);
+            return outcome ? Number(outcome.odd) : null;
+        }
+
+        function syncSlipOddsForCurrentEvent() {
+            let slip = getSlip();
+            let changed = false;
+
+            slip = slip.map(item => {
+                const freshOdd = findFreshOddForSlipItem(item);
+                if (freshOdd && freshOdd !== item.odd) {
+                    item.previousOdd = item.odd;
+                    item.odd = freshOdd;
+                    item.oddChangedAt = Date.now();
+                    changed = true;
+                }
+                return item;
+            });
+
+            if (changed) {
+                localStorage.setItem('visbet_slip', JSON.stringify(slip));
+                renderSlip();
+            }
+        }
+
+        function getPendingBet(fingerprint) {
+            const raw = localStorage.getItem('visbet_pending_bet');
+            let pending = null;
+            try { pending = raw ? JSON.parse(raw) : null; } catch (e) { pending = null; }
+            if (!pending || pending.fingerprint !== fingerprint) {
+                pending = {
+                    fingerprint,
+                    id: `bet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+                };
+                localStorage.setItem('visbet_pending_bet', JSON.stringify(pending));
+            }
+            return pending;
+        }
+
+        function setPlaceOrderBusy(isBusy) {
+            const btn = document.getElementById('btn-place-bet');
+            if (!btn) return;
+            btn.disabled = isBusy;
+            btn.style.opacity = isBusy ? '0.45' : '1';
+            btn.style.cursor = isBusy ? 'wait' : 'pointer';
+            btn.innerText = isBusy ? 'Отправляем...' : 'Сделать ставку';
+        }
 
         async function startPage() {
             const params = new URLSearchParams(window.location.search);
@@ -205,14 +277,15 @@
 
             // Загрузка матча
             const docRef = window.fb.doc(window.db, "events", id);
-            const snap = await window.fb.getDoc(docRef);
-
-            if (snap.exists()) {
-                currentEvent = { id: snap.id, ...snap.data() };
-                setTimeout(() => renderEventDetails(), 600); // Небольшая задержка для красоты скелетона
-            } else {
-                document.getElementById('event-details-container').innerHTML = "Событие не найдено.";
-            }
+            window.fb.onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    currentEvent = { id: snap.id, ...snap.data() };
+                    syncSlipOddsForCurrentEvent();
+                    renderEventDetails();
+                } else {
+                    document.getElementById('event-details-container').innerHTML = "Событие не найдено.";
+                }
+            });
         }
 
         function initUser() {
@@ -234,6 +307,7 @@
             if(!currentEvent) return;
             const slip = getSlip();
             const container = document.getElementById('event-details-container');
+            const isClosed = currentEvent.status === 'Закрыт';
             
             // Генерация ссылок на логотипы (используем инициалы команд)
             const getLogo = (name) => `https://api.dicebear.com/7.x/initials/svg?seed=${name}&backgroundColor=00f2ff,0072ff&fontSize=40`;
@@ -252,6 +326,7 @@
 
                     <div class="event-teams-large">${currentEvent.teams.home} — ${currentEvent.teams.away}</div>
                     <div style="opacity: 0.6; margin-top: 10px;">${currentEvent.date} в ${currentEvent.time}</div>
+                    ${isClosed ? '<div class="vb-badge danger" style="margin-top:14px;">Ставки закрыты</div>' : ''}
                 </div>
                 
                 ${currentEvent.markets.map(market => `
@@ -262,7 +337,7 @@
                                 const isSelected = slip.some(s => s.id === currentEvent.id && s.pick === out.name && s.market === market.name);
                                 return `
                                     <div class="odd-item ${isSelected ? 'selected' : ''}" 
-                                         onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')">
+                                         ${isClosed ? 'style="opacity:0.35; pointer-events:none;"' : `onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')"`}>
                                         <span class="odd-label" style="font-weight: 600; font-size: 14px;">${out.name}</span>
                                         <span class="odd-val">${out.odd}</span>
                                     </div>
@@ -281,7 +356,8 @@
             if(idx > -1) {
                 slip.splice(idx, 1); // Если уже есть - убираем (toggle)
             } else {
-                slip.push({id, team, pick, odd, market});
+                slip = slip.filter(i => !(i.id === id && i.market === market));
+                slip.push({id, team, pick, odd, market, addedAt: Date.now()});
             }
             saveSlip(slip);
         };
@@ -299,13 +375,8 @@
                 return;
             }
 
-            // Конфликт: нельзя брать несколько исходов одного матча в экспресс
-            let hasConflict = false;
-            const seenMatches = {};
-            slip.forEach(item => {
-                if(seenMatches[item.id]) hasConflict = true;
-                seenMatches[item.id] = true;
-            });
+            // Конфликт: нельзя брать несколько исходов одного рынка в экспресс
+            const hasConflict = hasSlipConflict(slip);
 
             container.innerHTML = slip.map((item, idx) => `
                 <div class="glass" style="padding:12px; border-radius:10px; margin-bottom:8px; border-left: 4px solid var(--turquoise);">
@@ -317,6 +388,7 @@
                         <span style="opacity:0.6;">${item.market}: <b>${item.pick}</b></span>
                         <span style="color:var(--turquoise); font-weight:bold;">${item.odd}</span>
                     </div>
+                    ${item.previousOdd && item.previousOdd !== item.odd ? `<div class="odds-change">было ${item.previousOdd}, стало ${item.odd}</div>` : ''}
                 </div>
             `).join('');
 
@@ -341,12 +413,15 @@
         };
 
         window.placeOrder = async () => {
+            if (isPlacingBet) return alert("Ставка уже отправляется");
             if(!currentUser) return alert("Пожалуйста, войдите в аккаунт");
             const slip = getSlip();
             const amount = Math.floor(document.getElementById('stakeAmount').value);
             
             if(!amount || amount < 10) return alert("Минимальная ставка 10 ₽");
             if(amount > currentUser.balance) return alert("Недостаточно средств");
+            if(slip.length === 0) return alert("Купон пуст");
+            if(hasSlipConflict(slip)) return alert("Нельзя выбрать несколько исходов одного рынка");
 
             const bet = {
                 userId: currentUser.username,
@@ -357,17 +432,67 @@
                 date: new Date().toLocaleString(),
                 timestamp: Date.now()
             };
+            const fingerprint = JSON.stringify({
+                userId: currentUser.username,
+                amount,
+                totalOdd: bet.totalOdd,
+                items: slip.map(item => ({
+                    id: item.id,
+                    market: item.market,
+                    pick: item.pick,
+                    odd: item.odd
+                }))
+            });
+            const pendingBet = getPendingBet(fingerprint);
+            let createdNewBet = false;
 
             try {
-                await window.fb.setDoc(window.fb.doc(window.db, "bets", "bet_" + Date.now()), bet);
-                await window.fb.updateDoc(window.fb.doc(window.db, "users", currentUser.username), {
-                    balance: currentUser.balance - amount
+                isPlacingBet = true;
+                setPlaceOrderBusy(true);
+
+                await window.fb.runTransaction(window.db, async (transaction) => {
+                    const betRef = window.fb.doc(window.db, "bets", pendingBet.id);
+                    const userRef = window.fb.doc(window.db, "users", currentUser.username);
+                    const existingBet = await transaction.get(betRef);
+                    if (existingBet.exists()) return;
+                    createdNewBet = true;
+
+                    const userSnap = await transaction.get(userRef);
+                    if (!userSnap.exists()) throw new Error("Пользователь не найден");
+                    const freshUser = userSnap.data();
+                    if ((freshUser.balance || 0) < amount) throw new Error("Недостаточно средств");
+
+                    transaction.set(betRef, {
+                        ...bet,
+                        requestKey: fingerprint,
+                        idempotencyKey: pendingBet.id
+                    });
+                    transaction.update(userRef, {
+                        balance: (freshUser.balance || 0) - amount
+                    });
                 });
+
+                if (createdNewBet) {
+                    await window.fb.setDoc(window.fb.doc(window.db, "balance_history", `bh_${pendingBet.id}`), {
+                        userId: currentUser.username,
+                        type: "Ставка",
+                        label: `Списано за пари ${pendingBet.id.slice(-6)}`,
+                        amount: -amount,
+                        betId: pendingBet.id,
+                        createdAt: new Date().toLocaleString(),
+                        timestamp: Date.now()
+                    });
+                }
+
                 saveSlip([]);
+                localStorage.removeItem('visbet_pending_bet');
                 alert("Пари успешно принято!");
                 location.href = 'index.html';
             } catch(e) {
-                alert("Ошибка соединения с сервером");
+                alert(e.message || "Ошибка соединения с сервером");
+            } finally {
+                isPlacingBet = false;
+                setPlaceOrderBusy(false);
             }
         };
 

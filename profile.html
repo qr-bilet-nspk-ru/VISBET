@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль | VisBET</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-shell { max-width: 1240px; margin: 0 auto; padding: 24px; }
+        .profile-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .profile-name { font-size: 34px; font-weight: 950; line-height: 1; margin-top: 8px; }
+        .profile-balance { font-size: 38px; font-weight: 950; color: var(--turquoise); margin-top: 10px; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
+        .history-list { display: grid; gap: 12px; }
+        .profile-bet {
+            padding: 16px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .ledger-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .ledger-item:last-child { border-bottom: 0; }
+        .amount-plus { color: #00ff88; font-weight: 900; }
+        .amount-minus { color: #ff7777; font-weight: 900; }
+        @media (max-width: 900px) {
+            .profile-shell { padding: 14px 12px 86px; }
+            .profile-hero, .profile-grid { grid-template-columns: 1fr; }
+            .profile-name { font-size: 28px; }
+            .profile-balance { font-size: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
+        <nav class="top-nav" style="display:flex; gap:10px; margin-left:20px;">
+            <button class="nav-link" onclick="location.href='index.html'"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span> Линия</button>
+            <button class="nav-link active"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span> Профиль</button>
+            <button class="nav-link" onclick="location.href='admin.html'" id="profile-admin-link" style="display:none;">Админка</button>
+        </nav>
+        <div id="auth-zone" class="user-info"></div>
+    </header>
+
+    <main class="profile-shell">
+        <section class="profile-hero">
+            <div class="vb-card">
+                <span class="vb-kicker">Игровой профиль</span>
+                <div class="profile-name" id="profile-name">Гость</div>
+                <div class="vb-subtle" id="profile-meta">Войдите, чтобы видеть статистику</div>
+                <div class="profile-balance" id="profile-balance">0 ₽</div>
+            </div>
+            <div class="vb-card">
+                <span class="vb-kicker">ROI</span>
+                <div class="profile-balance" id="profile-roi">0%</div>
+                <div class="vb-subtle">Расчёт по всем завершённым ставкам: прибыль относительно суммы ставок.</div>
+            </div>
+        </section>
+
+        <section class="stat-grid" id="profile-stats">
+            <div class="stat-card"><span>Всего ставок</span><strong>0</strong></div>
+            <div class="stat-card"><span>В игре</span><strong>0</strong></div>
+            <div class="stat-card"><span>Выиграно</span><strong>0</strong></div>
+            <div class="stat-card"><span>Профит</span><strong>0 ₽</strong></div>
+        </section>
+
+        <section class="profile-grid" style="margin-top:18px;">
+            <div class="vb-card">
+                <div class="vb-between">
+                    <div>
+                        <span class="vb-kicker">История ставок</span>
+                        <h2 class="vb-title">Мои пари</h2>
+                    </div>
+                    <input class="vb-input" id="profile-date" type="date" style="max-width:180px;" onchange="renderProfile()">
+                </div>
+                <div class="filter-bar">
+                    <button class="filter-pill active" data-filter="all" onclick="setProfileFilter('all', this)">Все</button>
+                    <button class="filter-pill" data-filter="В игре" onclick="setProfileFilter('В игре', this)">В игре</button>
+                    <button class="filter-pill" data-filter="Выигрыш" onclick="setProfileFilter('Выигрыш', this)">Выигрыш</button>
+                    <button class="filter-pill" data-filter="Проигрыш" onclick="setProfileFilter('Проигрыш', this)">Проигрыш</button>
+                </div>
+                <div class="history-list" id="profile-bets"></div>
+            </div>
+
+            <aside class="vb-card">
+                <span class="vb-kicker">История баланса</span>
+                <h2 class="vb-title">Движение средств</h2>
+                <div id="balance-ledger" style="margin-top:12px;"></div>
+            </aside>
+        </section>
+    </main>
+
+    <div class="mobile-tabbar">
+        <button onclick="location.href='index.html'">Линия</button>
+        <button class="active">Профиль</button>
+        <button onclick="location.href='index.html';">История</button>
+        <button onclick="location.href='index.html'">Купон</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
+            authDomain: "visbet-b4fa1.firebaseapp.com",
+            projectId: "visbet-b4fa1",
+            storageBucket: "visbet-b4fa1.firebasestorage.app",
+            messagingSenderId: "551263525115",
+            appId: "1:551263525115:web:05265f14a1f1e77d48f85e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.fb = { collection, getDocs, doc, getDoc, query, where };
+        startProfile();
+    </script>
+
+    <script>
+        let currentUser = null;
+        let profileBets = [];
+        let ledger = [];
+        let profileFilter = 'all';
+
+        function formatMoney(num) {
+            return new Intl.NumberFormat('ru-RU').format(Math.round(num || 0)) + " ₽";
+        }
+
+        function normalizeStatus(status) {
+            return status === 'Победа' ? 'Выигрыш' : (status || 'В игре');
+        }
+
+        async function startProfile() {
+            const username = localStorage.getItem('visbet_user');
+            if (!username) {
+                document.getElementById('auth-zone').innerHTML = `<button class="vb-btn primary" onclick="location.href='register.html'">Войти</button>`;
+                document.getElementById('profile-bets').innerHTML = `<div class="vb-subtle">Войдите в аккаунт, чтобы увидеть историю.</div>`;
+                return;
+            }
+
+            const snap = await window.fb.getDoc(window.fb.doc(window.db, "users", username));
+            if (!snap.exists()) return location.href = 'register.html';
+
+            currentUser = snap.data();
+            if (currentUser.role === 'admin' || currentUser.role === 'owner' || currentUser.username?.toLowerCase() === 'admin') {
+                document.getElementById('profile-admin-link').style.display = 'inline-flex';
+            }
+            document.getElementById('auth-zone').innerHTML = `
+                <div class="balance">${formatMoney(currentUser.balance)}</div>
+                <div class="username">${currentUser.username}</div>
+                <button class="btn-logout" onclick="localStorage.clear(); location.href='index.html'">Выйти</button>
+            `;
+
+            await Promise.all([loadBets(), loadLedger()]);
+            renderProfile();
+        }
+
+        async function loadBets() {
+            const q = window.fb.query(window.fb.collection(window.db, "bets"), window.fb.where("userId", "==", currentUser.username));
+            const snap = await window.fb.getDocs(q);
+            profileBets = [];
+            snap.forEach(doc => profileBets.push({ id: doc.id, ...doc.data() }));
+            profileBets.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        }
+
+        async function loadLedger() {
+            ledger = [];
+            try {
+                const q = window.fb.query(window.fb.collection(window.db, "balance_history"), window.fb.where("userId", "==", currentUser.username));
+                const snap = await window.fb.getDocs(q);
+                snap.forEach(doc => ledger.push({ id: doc.id, ...doc.data() }));
+            } catch (e) {
+                ledger = [];
+            }
+
+            const derived = profileBets.flatMap(bet => {
+                const status = normalizeStatus(bet.status);
+                const rows = [{
+                    timestamp: bet.timestamp || 0,
+                    date: bet.date,
+                    type: 'Ставка',
+                    label: `Списано за пари ${bet.id.slice(-6)}`,
+                    amount: -(bet.amount || 0)
+                }];
+                if (status === 'Выигрыш') {
+                    rows.push({
+                        timestamp: (bet.timestamp || 0) + 1,
+                        date: bet.resolvedAt || bet.date,
+                        type: 'Выигрыш',
+                        label: `Выплата по пари ${bet.id.slice(-6)}`,
+                        amount: Math.round((bet.amount || 0) * (bet.totalOdd || 0))
+                    });
+                }
+                return rows;
+            });
+
+            ledger = [...ledger, ...derived].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 80);
+        }
+
+        window.setProfileFilter = (filter, el) => {
+            profileFilter = filter;
+            document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            renderProfile();
+        };
+
+        window.renderProfile = () => {
+            if (!currentUser) return;
+            const date = document.getElementById('profile-date').value;
+            const bets = profileBets.filter(bet => {
+                const status = normalizeStatus(bet.status);
+                const byStatus = profileFilter === 'all' || status === profileFilter;
+                const betIsoDate = bet.timestamp ? new Date(bet.timestamp).toISOString().slice(0, 10) : '';
+                const byDate = !date || betIsoDate === date || String(bet.date || bet.resolvedAt || '').includes(date);
+                return byStatus && byDate;
+            });
+
+            const totalStake = profileBets.reduce((sum, bet) => sum + (bet.amount || 0), 0);
+            const wins = profileBets.filter(bet => normalizeStatus(bet.status) === 'Выигрыш');
+            const losses = profileBets.filter(bet => normalizeStatus(bet.status) === 'Проигрыш');
+            const active = profileBets.filter(bet => normalizeStatus(bet.status) === 'В игре');
+            const payout = wins.reduce((sum, bet) => sum + Math.round((bet.amount || 0) * (bet.totalOdd || 0)), 0);
+            const profit = payout - totalStake;
+            const roi = totalStake > 0 ? ((profit / totalStake) * 100).toFixed(1) : '0.0';
+
+            document.getElementById('profile-name').innerText = currentUser.username;
+            document.getElementById('profile-meta').innerText = `Роль: ${currentUser.role || 'user'} | Ставок: ${profileBets.length}`;
+            document.getElementById('profile-balance').innerText = formatMoney(currentUser.balance);
+            document.getElementById('profile-roi').innerText = `${roi}%`;
+            document.getElementById('profile-stats').innerHTML = `
+                <div class="stat-card"><span>Всего ставок</span><strong>${profileBets.length}</strong></div>
+                <div class="stat-card"><span>В игре</span><strong>${active.length}</strong></div>
+                <div class="stat-card"><span>Выиграно</span><strong>${wins.length}</strong></div>
+                <div class="stat-card"><span>Профит</span><strong>${formatMoney(profit)}</strong></div>
+            `;
+
+            document.getElementById('profile-bets').innerHTML = bets.map(bet => {
+                const status = normalizeStatus(bet.status);
+                const statusClass = status === 'Выигрыш' ? 'success' : (status === 'Проигрыш' ? 'danger' : 'warning');
+                const items = Array.isArray(bet.items) ? bet.items : [];
+                return `
+                    <div class="profile-bet">
+                        <div class="vb-between">
+                            <div>
+                                <b>Пари #${bet.id.slice(-6)}</b>
+                                <div class="vb-subtle">${bet.date || ''}</div>
+                            </div>
+                            <span class="vb-badge ${statusClass}">${status}</span>
+                        </div>
+                        <div style="margin-top:10px; color:var(--text-soft); font-size:13px;">
+                            ${items.map(item => `${item.team || item.id}: ${item.market || ''} ${item.pick || ''} (${item.odd})`).join('<br>')}
+                        </div>
+                        <div class="vb-between" style="margin-top:12px;">
+                            <span class="vb-subtle">Сумма: ${formatMoney(bet.amount)}</span>
+                            <b style="color:var(--turquoise)">Кф ${bet.totalOdd || 0}</b>
+                        </div>
+                    </div>
+                `;
+            }).join('') || `<div class="vb-subtle">По выбранному фильтру ставок нет.</div>`;
+
+            document.getElementById('balance-ledger').innerHTML = ledger.map(row => `
+                <div class="ledger-item">
+                    <div>
+                        <b>${row.type || row.action || 'Операция'}</b>
+                        <div class="vb-subtle">${row.label || row.reason || row.date || row.createdAt || ''}</div>
+                    </div>
+                    <div class="${(row.amount || row.delta || 0) >= 0 ? 'amount-plus' : 'amount-minus'}">${formatMoney(row.amount || row.delta || 0)}</div>
+                </div>
+            `).join('') || `<div class="vb-subtle">Движений баланса пока нет.</div>`;
+        };
+    </script>
+</body>
+</html>

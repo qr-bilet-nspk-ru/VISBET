@@ -349,3 +349,18 @@ function renderHistory() {
 
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+// Функции для мобильной навигации
+window.showHistory = function() {
+    // Если у тебя есть вкладка с историей, переключаем на неё
+    const historyTab = document.getElementById('history-section') || document.querySelector('.history-container');
+    if (historyTab) {
+        document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+        historyTab.classList.add('active');
+    } else {
+        // Если отдельной вкладки нет, можем просто прокрутить к истории или вывести алерт
+        console.log("Открываем историю ставок...");
+        // Логика открытия истории из твоего main.js
+        if(typeof renderHistory === "function") renderHistory();
+    }
+};
+

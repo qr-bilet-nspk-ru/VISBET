@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VisBET | Professional Betting Platform</title>
@@ -202,6 +207,31 @@
         
         .odd-box.selected { background: var(--turquoise) !important; border-color: var(--turquoise) !important; }
         .odd-box.selected .label, .odd-box.selected .val { color: #000 !important; font-weight: 800; }
+
+        .line-search {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .line-search input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            outline: none;
+        }
+        .line-search input:focus { border-color: var(--turquoise); }
+        .odds-change {
+            margin-top: 7px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(255, 170, 0, 0.12);
+            color: #ffcc66;
+            font-size: 11px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -219,9 +249,10 @@
     <header class="header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
         <nav class="top-nav" style="display: flex; gap: 10px; margin-left: 20px;">
-            <button class="nav-link active" data-tab="line" onclick="switchMainTab('line')">Все события</button>
-            <button class="nav-link" data-tab="history" onclick="switchMainTab('history')">История ставок</button>
-            <button class="nav-link" data-tab="promo" onclick="switchMainTab('promo')">Акции</button>
+            <button class="nav-link active" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span> Линия</button>
+            <button class="nav-link" data-tab="history" onclick="switchMainTab('history')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><path d="M5 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.8-7"/></svg></span> История</button>
+            <button class="nav-link" onclick="location.href='profile.html'"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span> Профиль</button>
+            <button class="nav-link" data-tab="promo" onclick="switchMainTab('promo')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5C11 6 12 7 12 7z"/><path d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5C13 6 12 7 12 7z"/></svg></span> Акции</button>
         </nav>
         <div class="user-info-wrapper" style="display: flex; align-items: center; gap: 15px;">
             <button id="adminMainButton" class="nav-link" onclick="location.href='admin.html'" style="display: none; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 8px 15px;">Админ-панель</button>
@@ -233,10 +264,13 @@
         <aside id="leftSidebar" class="sidebar glass">
             <h3>Дисциплины</h3>
             <ul id="sportFilter">
-                <li class="active" onclick="filterEvents('Все')">Все события</li>
-                <li onclick="filterEvents('Футбол')">Футбол</li>
-                <li onclick="filterEvents('Киберспорт')">Киберспорт</li>
+                <li class="active" onclick="filterEvents('Все', this)">Все события</li>
+                <li onclick="filterEvents('Футбол', this)">Футбол</li>
+                <li onclick="filterEvents('Киберспорт', this)">Киберспорт</li>
             </ul>
+            <div class="line-search">
+                <input type="search" id="line-search" placeholder="Команда или лига" oninput="applyLineFilters()">
+            </div>
         </aside>
 
         <section class="content-area">
@@ -269,24 +303,31 @@
                     <p style="text-align: center; color: var(--text-muted); padding: 20px;">Выберите исход</p>
                 </div>
                 <div id="slip-footer" style="display: none; margin-top: 20px;">
-                    <div id="conflict-warning" style="color: #ff4d4d; font-size: 11px; text-align: center; margin-bottom: 10px; font-weight: bold; display: none; background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;">Пари не совместимо с другим</div>
+                    <div id="conflict-warning" style="color: #ff4d4d; font-size: 11px; text-align: center; margin-bottom: 10px; font-weight: bold; display: none; background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;">Несколько исходов одного рынка нельзя ставить вместе</div>
                     
                     <div class="coupon-summary">
                         <input type="number" id="stakeAmount" placeholder="Сумма (₽)" oninput="updateWin()">
                         <div class="summary-row"><span>Общий Кф:</span><span id="summary-odd" style="color: var(--turquoise); font-weight: 800;">1.00</span></div>
                         <div class="summary-row"><span>Выигрыш:</span><span id="winAmount" style="color: var(--success);">0 ₽</span></div>
                     </div>
-                    <button class="btn-submit-bet" onclick="placeOrder()">Заключить пари</button>
+                    <button class="btn-submit-bet" id="btn-place-bet" onclick="placeOrder()">Заключить пари</button>
                     <button onclick="clearSlip()" style="background:none; border:none; color:var(--danger); width:100%; margin-top:10px; cursor:pointer; font-size:11px;">Очистить купон</button>
                 </div>
             </div>
         </aside>
     </div>
 
+    <div class="mobile-tabbar">
+        <button class="active" onclick="switchMainTab('line')">Линия</button>
+        <button onclick="switchMainTab('history')">История</button>
+        <button onclick="location.href='profile.html'">Профиль</button>
+        <button onclick="document.getElementById('rightCoupon')?.scrollIntoView({behavior:'smooth'})">Купон</button>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
-            getFirestore, collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot 
+            getFirestore, collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot, runTransaction 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -302,7 +343,7 @@
         const db = getFirestore(app);
         window.db = db;
         // Экспортируем все нужные функции в глобальное окно
-        window.fb = { collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot };
+        window.fb = { collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot, runTransaction };
         
         checkSession();
         loadEvents(); // Теперь эта функция создает постоянную связь (live)
@@ -312,6 +353,8 @@
     <script>
         let allEvents = [];
         let currentUser = null;
+        let currentSportFilter = 'Все';
+        let isPlacingBet = false;
 
        /**
  * Улучшенная система уведомлений VisBET
@@ -370,12 +413,57 @@ window.showToast = (message, type = 'info', title = '') => {
             return `<div class="team-logo">${letter}</div>`;
         }
 
+        function escapeJsArg(value) {
+            return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
+        }
+
         const getSlip = () => JSON.parse(localStorage.getItem('visbet_slip') || '[]');
         const saveSlip = (data) => { 
             localStorage.setItem('visbet_slip', JSON.stringify(data)); 
             renderSlip(); 
             updateSelectedOdds();
         };
+
+        function hasSlipConflict(slip) {
+            const seen = {};
+            return slip.some(item => {
+                const key = `${item.id}::${item.market || 'market'}`;
+                const duplicate = Boolean(seen[key]);
+                seen[key] = true;
+                return duplicate;
+            });
+        }
+
+        function findFreshOddForSlipItem(freshEvent, item) {
+            if (!freshEvent || !Array.isArray(freshEvent.markets)) return null;
+            const market = freshEvent.markets.find(m => m.name === item.market) || freshEvent.markets[0];
+            if (!market || !Array.isArray(market.outcomes)) return null;
+            const outcome = market.outcomes.find(out => (out.name || out.label) === item.pick);
+            return outcome ? Number(outcome.odd) : null;
+        }
+
+        function getPendingBet(fingerprint) {
+            const raw = localStorage.getItem('visbet_pending_bet');
+            let pending = null;
+            try { pending = raw ? JSON.parse(raw) : null; } catch (e) { pending = null; }
+            if (!pending || pending.fingerprint !== fingerprint) {
+                pending = {
+                    fingerprint,
+                    id: `bet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+                };
+                localStorage.setItem('visbet_pending_bet', JSON.stringify(pending));
+            }
+            return pending;
+        }
+
+        function setPlaceOrderBusy(isBusy) {
+            const btn = document.getElementById('btn-place-bet');
+            if (!btn) return;
+            btn.disabled = isBusy;
+            btn.style.opacity = isBusy ? '0.45' : '1';
+            btn.style.cursor = isBusy ? 'wait' : 'pointer';
+            btn.innerText = isBusy ? 'Отправляем...' : 'Заключить пари';
+        }
 
         function updateSelectedOdds() {
             const slip = getSlip();
@@ -443,7 +531,8 @@ window.showToast = (message, type = 'info', title = '') => {
         }
 
         function renderBetCard(bet) {
-            const statusClass = bet.status === 'Победа' ? 'status-win' : (bet.status === 'Проигрыш' ? 'status-loss' : 'status-pending');
+            const isWin = bet.status === 'Победа' || bet.status === 'Выигрыш';
+            const statusClass = isWin ? 'status-win' : (bet.status === 'Проигрыш' ? 'status-loss' : 'status-pending');
             const totalWin = Math.round(bet.amount * bet.totalOdd);
             return `
                 <div class="bet-card">
@@ -461,7 +550,7 @@ window.showToast = (message, type = 'info', title = '') => {
                         <div><span class="bet-sum-label">Сумма</span><span class="bet-sum-val">${formatMoney(bet.amount)}</span></div>
                         <div style="text-align:center"><span class="bet-sum-label">Кф</span><span class="bet-sum-val" style="color:var(--turquoise)">${bet.totalOdd}</span></div>
                         <div class="potential-win">
-                            <span class="win-label">${bet.status === 'Победа' ? 'Выигрыш' : 'Возможный'}</span>
+                            <span class="win-label">${isWin ? 'Выигрыш' : 'Возможный'}</span>
                             <span class="win-val" style="color:${bet.status === 'Проигрыш' ? '#ff4d4d' : '#00ff88'}">${formatMoney(totalWin)}</span>
                         </div>
                     </div>
@@ -485,12 +574,34 @@ window.showToast = (message, type = 'info', title = '') => {
             if (tab === 'history') loadHistory();
         };
 
-        window.filterEvents = (sport) => {
+        window.applyLineFilters = () => {
+            const search = (document.getElementById('line-search')?.value || '').trim().toLowerCase();
+            let filtered = currentSportFilter === 'Все'
+                ? allEvents.filter(ev => ev.status !== 'Закрыт')
+                : allEvents.filter(ev => ev.sport === currentSportFilter && ev.status !== 'Закрыт');
+
+            if (search) {
+                filtered = filtered.filter(ev => {
+                    const fields = [
+                        ev.sport,
+                        ev.league,
+                        ev.teams?.home,
+                        ev.teams?.away
+                    ].filter(Boolean).join(' ').toLowerCase();
+                    return fields.includes(search);
+                });
+            }
+
+            renderLine(filtered);
+        };
+
+        window.filterEvents = (sport, el = null) => {
+            currentSportFilter = sport;
             document.querySelectorAll('#sportFilter li').forEach(li => li.classList.remove('active'));
-            event.target.classList.add('active');
+            const target = el || window.event?.target;
+            if (target) target.classList.add('active');
             document.getElementById('current-category').innerText = sport;
-            if (sport === 'Все') renderLine(allEvents);
-            else renderLine(allEvents.filter(ev => ev.sport === sport));
+            applyLineFilters();
         };
 
         // --- LIVE РЕЖИМ: ЗАГРУЗКА СОБЫТИЙ ЧЕРЕЗ ONSNAPSHOT ---
@@ -508,15 +619,7 @@ window.showToast = (message, type = 'info', title = '') => {
                 allEvents = [];
                 snapshot.forEach(doc => allEvents.push({id: doc.id, ...doc.data()}));
                 
-                // Проверяем текущий выбранный спорт в боковом меню
-                const activeLi = document.querySelector('#sportFilter li.active');
-                const currentSport = activeLi ? activeLi.innerText : 'Все события';
-
-                if (currentSport === 'Все события' || currentSport === 'Все') {
-                    renderLine(allEvents);
-                } else {
-                    renderLine(allEvents.filter(ev => ev.sport === currentSport));
-                }
+                applyLineFilters();
 
                 // Синхронизируем коэффициенты в купоне, если они изменились в базе
                 syncSlipOdds();
@@ -530,20 +633,17 @@ window.showToast = (message, type = 'info', title = '') => {
         function syncSlipOdds() {
             let slip = getSlip();
             let changed = false;
+            const changedItems = [];
 
             slip = slip.map(item => {
                 const freshEvent = allEvents.find(e => e.id === item.id);
-                if (freshEvent) {
-                    let freshOdd;
-                    // Проверяем маркеты
-                    if (item.pick === 'П1') freshOdd = freshEvent.markets[0].outcomes[0].odd;
-                    else if (item.pick === 'X') freshOdd = freshEvent.markets[0].outcomes[1].odd;
-                    else if (item.pick === 'П2') freshOdd = freshEvent.markets[0].outcomes[freshEvent.markets[0].outcomes.length - 1].odd;
-
-                    if (freshOdd && freshOdd !== item.odd) {
-                        item.odd = freshOdd;
-                        changed = true;
-                    }
+                const freshOdd = findFreshOddForSlipItem(freshEvent, item);
+                if (freshOdd && freshOdd !== item.odd) {
+                    item.previousOdd = item.odd;
+                    item.odd = freshOdd;
+                    item.oddChangedAt = Date.now();
+                    changedItems.push(`${item.pick}: было ${item.previousOdd}, стало ${item.odd}`);
+                    changed = true;
                 }
                 return item;
             });
@@ -551,37 +651,42 @@ window.showToast = (message, type = 'info', title = '') => {
             if (changed) {
                 localStorage.setItem('visbet_slip', JSON.stringify(slip));
                 renderSlip();
+                showToast(`Коэффициент изменился: ${changedItems[0]}`, "info");
             }
         }
 
         function renderLine(events) {
             const container = document.getElementById('eventsContainer');
             if (events.length === 0) { container.innerHTML = "<p style='opacity:0.5'>Событий нет</p>"; return; }
-            container.innerHTML = events.map(ev => `
-                <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${ev.id}')">
+            container.innerHTML = events.map(ev => {
+                const market = ev.markets?.[0];
+                const outcomes = market?.outcomes || [];
+                const marketName = market?.name || 'Основной рынок';
+                const teamName = `${ev.teams.home} — ${ev.teams.away}`;
+                return `
+                <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${escapeJsArg(ev.id)}')">
                     <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center;">
                         <span>${ev.league} | ${ev.date} ${ev.time}</span>
                         <span style="background:rgba(0,242,255,0.1); padding:4px 8px; border-radius:5px; color:var(--turquoise)">${ev.sport}</span>
                     </div>
                     <div class="match-teams-row">
                         ${getTeamLogo(ev.teams.home)}
-                        <div style="font-size:18px; font-weight:bold; flex:1;">${ev.teams.home} — ${ev.teams.away}</div>
+                        <div style="font-size:18px; font-weight:bold; flex:1;">${teamName}</div>
                         ${getTeamLogo(ev.teams.away)}
                     </div>
                     <div class="odds-row" style="display:flex; gap:10px;" onclick="event.stopPropagation()">
-                        <div class="odd-box" data-event-id="${ev.id}" data-pick="П1" onclick="addToSlip('${ev.id}', '${ev.teams.home} — ${ev.teams.away}', 'П1', ${ev.markets[0].outcomes[0].odd}, '${ev.markets[0].name}')">
-                            <span class="label">П1</span><span class="val">${ev.markets[0].outcomes[0].odd}</span>
-                        </div>
-                        ${ev.markets[0].outcomes[1] ? `
-                        <div class="odd-box" data-event-id="${ev.id}" data-pick="X" onclick="addToSlip('${ev.id}', '${ev.teams.home} — ${ev.teams.away}', 'X', ${ev.markets[0].outcomes[1].odd}, '${ev.markets[0].name}')">
-                            <span class="label">X</span><span class="val">${ev.markets[0].outcomes[1].odd}</span>
-                        </div>` : ''}
-                        <div class="odd-box" data-event-id="${ev.id}" data-pick="П2" onclick="addToSlip('${ev.id}', '${ev.teams.home} — ${ev.teams.away}', 'П2', ${ev.markets[0].outcomes[ev.markets[0].outcomes.length - 1].odd}, '${ev.markets[0].name}')">
-                            <span class="label">П2</span><span class="val">${ev.markets[0].outcomes[ev.markets[0].outcomes.length - 1].odd}</span>
-                        </div>
+                        ${outcomes.map(out => {
+                            const label = out.name || out.label || 'Исход';
+                            return `
+                                <div class="odd-box" data-event-id="${ev.id}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(teamName)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')">
+                                    <span class="label">${label}</span><span class="val">${out.odd}</span>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
             updateSelectedOdds();
         }
 
@@ -589,12 +694,13 @@ window.showToast = (message, type = 'info', title = '') => {
 
         window.addToSlip = (id, team, pick, odd, market) => {
             let slip = getSlip();
-            const existingIndex = slip.findIndex(i => i.id === id && i.pick === pick);
+            const existingIndex = slip.findIndex(i => i.id === id && i.pick === pick && i.market === market);
             if (existingIndex !== -1) {
                 slip.splice(existingIndex, 1);
                 showToast("Событие удалено из купона", "info");
             } else {
-                slip.push({id, team, pick, odd, market});
+                slip = slip.filter(i => !(i.id === id && i.market === market));
+                slip.push({id, team, pick, odd, market, addedAt: Date.now()});
                 showToast("Событие добавлено!", "success");
             }
             saveSlip(slip);
@@ -605,7 +711,7 @@ window.showToast = (message, type = 'info', title = '') => {
             const container = document.getElementById('slip-items');
             const footer = document.getElementById('slip-footer');
             const warn = document.getElementById('conflict-warning');
-            const btn = document.querySelector('.btn-submit-bet');
+            const btn = document.getElementById('btn-place-bet');
 
             if(slip.length === 0) {
                 container.innerHTML = `<p style="text-align:center; padding:20px; color:gray;">Выберите исход</p>`;
@@ -614,9 +720,7 @@ window.showToast = (message, type = 'info', title = '') => {
                 return;
             }
 
-            let hasConflict = false;
-            const seen = {};
-            slip.forEach(item => { if(seen[item.id]) hasConflict = true; seen[item.id] = true; });
+            const hasConflict = hasSlipConflict(slip);
 
             if(warn) warn.style.display = hasConflict ? 'block' : 'none';
             if(btn) {
@@ -635,6 +739,7 @@ window.showToast = (message, type = 'info', title = '') => {
                         <span style="font-size:11px; opacity:0.7;">${item.pick}</span>
                         <span style="color:var(--turquoise); font-weight:bold;">${item.odd}</span>
                     </div>
+                    ${item.previousOdd && item.previousOdd !== item.odd ? `<div class="odds-change">было ${item.previousOdd}, стало ${item.odd}</div>` : ''}
                 </div>
             `).join('');
             footer.style.display = 'block';
@@ -661,11 +766,17 @@ window.showToast = (message, type = 'info', title = '') => {
         window.clearSlip = () => { saveSlip([]); showToast("Купон очищен", "info"); };
 
         window.placeOrder = async () => {
+            if (isPlacingBet) {
+                showToast("Ставка уже отправляется", "info");
+                return;
+            }
             if(!currentUser) { showToast("Войдите в аккаунт!", "error"); return; }
             const slip = getSlip();
             const amount = Math.round(parseFloat(document.getElementById('stakeAmount').value));
             if(!amount || amount < 10) { showToast("Минимум 10 ₽", "error"); return; }
             if(amount > currentUser.balance) { showToast("Недостаточно средств!", "error"); return; }
+            if(slip.length === 0) { showToast("Купон пуст", "error"); return; }
+            if(hasSlipConflict(slip)) { showToast("Нельзя выбрать несколько исходов одного рынка", "error"); return; }
 
             const betData = {
                 userId: currentUser.username,
@@ -673,22 +784,76 @@ window.showToast = (message, type = 'info', title = '') => {
                 totalOdd: parseFloat(document.getElementById('summary-odd').innerText),
                 items: slip,
                 status: "В игре",
-                date: new Date().toLocaleString()
+                date: new Date().toLocaleString(),
+                timestamp: Date.now()
             };
+            const fingerprint = JSON.stringify({
+                userId: currentUser.username,
+                amount,
+                totalOdd: betData.totalOdd,
+                items: slip.map(item => ({
+                    id: item.id,
+                    market: item.market,
+                    pick: item.pick,
+                    odd: item.odd
+                }))
+            });
+            const pendingBet = getPendingBet(fingerprint);
+            let createdNewBet = false;
 
             try {
-                await window.fb.setDoc(window.fb.doc(window.db, "bets", "bet_" + Date.now()), betData);
-                await window.fb.updateDoc(window.fb.doc(window.db, "users", currentUser.username), {
-                    balance: Math.round(currentUser.balance - amount)
+                isPlacingBet = true;
+                setPlaceOrderBusy(true);
+
+                await window.fb.runTransaction(window.db, async (transaction) => {
+                    const betRef = window.fb.doc(window.db, "bets", pendingBet.id);
+                    const userRef = window.fb.doc(window.db, "users", currentUser.username);
+                    const existingBet = await transaction.get(betRef);
+                    if (existingBet.exists()) return;
+                    createdNewBet = true;
+
+                    const userSnap = await transaction.get(userRef);
+                    if (!userSnap.exists()) throw new Error("Пользователь не найден");
+                    const freshUser = userSnap.data();
+                    if (Math.round(freshUser.balance || 0) < amount) throw new Error("Недостаточно средств");
+
+                    transaction.set(betRef, {
+                        ...betData,
+                        requestKey: fingerprint,
+                        idempotencyKey: pendingBet.id
+                    });
+                    transaction.update(userRef, {
+                        balance: Math.round((freshUser.balance || 0) - amount)
+                    });
                 });
+
+                if (createdNewBet) {
+                    await window.fb.setDoc(window.fb.doc(window.db, "balance_history", `bh_${pendingBet.id}`), {
+                        userId: currentUser.username,
+                        type: "Ставка",
+                        label: `Списано за пари ${pendingBet.id.slice(-6)}`,
+                        amount: -amount,
+                        betId: pendingBet.id,
+                        createdAt: new Date().toLocaleString(),
+                        timestamp: Date.now()
+                    });
+                }
+
                 saveSlip([]);
+                localStorage.removeItem('visbet_pending_bet');
                 showToast("Ставка принята! Удачи!", "success");
                 // Обновляем данные пользователя без перезагрузки
                 setTimeout(() => checkSession(), 500); 
-            } catch (e) { showToast("Ошибка оформления ставки", "error"); }
+            } catch (e) {
+                showToast(e.message || "Ошибка оформления ставки", "error");
+            } finally {
+                isPlacingBet = false;
+                setPlaceOrderBusy(false);
+            }
         };
 
         window.addEventListener('storage', (e) => { if(e.key === 'visbet_slip') renderSlip(); });
     </script>
+ 
 </body>
 </html>
