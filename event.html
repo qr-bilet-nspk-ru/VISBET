@@ -2,7 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisBET События">
+    <meta name="theme-color" content="#0b0e11">
     <title>Линия события | VisBET</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -41,11 +45,13 @@
         .team-logo {
             width: 80px;
             height: 80px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.06);
             border-radius: 50%;
             padding: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
             object-fit: contain;
+            box-shadow: inset 0 0 20px rgba(56,189,248,0.12);
+            backdrop-filter: blur(10px);
         }
 
         .vs-divider {
@@ -62,7 +68,51 @@
             letter-spacing: -1px;
         }
 
-        .market-section { margin-bottom: 25px; }
+        .market-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .market-tab {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #c9d0d5;
+            padding: 10px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .market-tab:hover {
+            background: rgba(56,189,248,0.12);
+            color: var(--turquoise);
+            border-color: rgba(56,189,248,0.3);
+            transform: translateY(-1px);
+        }
+
+        .market-tab.active {
+            background: var(--turquoise);
+            color: #001314;
+            border-color: var(--turquoise);
+            box-shadow: 0 14px 35px rgba(56,189,248,0.16);
+        }
+
+        .market-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+        }
+
         .market-name {
             display: block;
             font-size: 13px;
@@ -90,10 +140,11 @@
             justify-content: space-between;
             align-items: center;
             transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .odd-item:hover {
-            background: rgba(0, 242, 255, 0.1);
+            background: rgba(56,189,248,0.12);
             border-color: var(--turquoise);
             transform: translateY(-2px);
         }
@@ -105,18 +156,118 @@
         .odd-item.selected span { color: #000 !important; }
 
         .conflict-msg { 
-            color: #ff4d4d; font-size: 11px; text-align: center; 
+            color: var(--danger); font-size: 11px; text-align: center; 
             margin-bottom: 10px; font-weight: bold; display: none; 
-            background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;
+            background: rgba(251, 113, 133, 0.12); padding: 8px; border-radius: 8px;
         }
         .odds-change {
             margin-top: 7px;
             padding: 6px 8px;
             border-radius: 8px;
-            background: rgba(255, 170, 0, 0.12);
-            color: #ffcc66;
+            background: rgba(56,189,248,0.12);
+            color: var(--accent);
             font-size: 11px;
             font-weight: 700;
+        }
+
+        /* Mobile optimization for event page */
+        @media (max-width: 760px) {
+            .event-main-info {
+                padding: 24px 16px;
+                margin-bottom: 20px;
+                border-radius: 16px;
+            }
+
+            .teams-display {
+                gap: 16px;
+                margin: 16px 0;
+            }
+
+            .team-logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .event-teams-large {
+                font-size: 22px;
+                letter-spacing: -0.5px;
+            }
+
+            .outcomes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 10px;
+            }
+
+            .odd-item {
+                padding: 12px;
+                border-radius: 10px;
+                font-size: 13px;
+            }
+
+            .market-name {
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .market-tabs {
+                gap: 8px;
+                margin-bottom: 18px;
+            }
+
+            .market-tab {
+                padding: 9px 14px;
+                font-size: 12px;
+            }
+
+            .market-section {
+                margin-bottom: 20px;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .event-main-info {
+                padding: 18px 12px;
+                margin-bottom: 16px;
+                border-radius: 14px;
+            }
+
+            .teams-display {
+                gap: 12px;
+                margin: 14px 0;
+            }
+
+            .team-logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .vs-divider {
+                font-size: 18px;
+            }
+
+            .event-teams-large {
+                font-size: 18px;
+            }
+
+            .outcomes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 8px;
+            }
+
+            .odd-item {
+                padding: 10px 8px;
+                border-radius: 10px;
+                font-size: 12px;
+                min-height: 48px;
+                touch-action: manipulation;
+            }
+
+            .odds-change {
+                margin-top: 5px;
+                padding: 5px 6px;
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -124,7 +275,9 @@
 
     <header class="header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
-        <div id="auth-zone" class="user-info"></div>
+        <div style="display:flex; gap:12px; align-items:center;">
+            <div id="auth-zone" class="user-info"></div>
+        </div>
     </header>
 
     <div class="main-layout" style="display: flex; gap: 25px; padding: 20px; max-width: 1400px; margin: 0 auto;">
@@ -162,11 +315,11 @@
                             <span>Общий Кф:</span><span id="summary-odd" style="color: var(--turquoise); font-weight: 800;">1.00</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 18px;">
-                            <span>К выплате:</span><span id="winAmount" style="color: #00ff88; font-weight: 900;">0 ₽</span>
+                            <span>К выплате:</span><span id="winAmount" style="color: var(--success); font-weight: 900;">0 ₽</span>
                         </div>
                     </div>
                     <button class="btn-submit-bet" id="btn-place-bet" onclick="placeOrder()" style="width: 100%; margin-top: 15px; padding: 15px; border-radius: 12px; border: none; background: var(--turquoise); color: #000; font-weight: bold; cursor: pointer;">Сделать ставку</button>
-                    <button onclick="clearSlip()" style="background:none; border:none; color:#ff4d4d; width:100%; margin-top:10px; cursor:pointer; font-size:11px; opacity: 0.5;">Очистить купон</button>
+                    <button onclick="clearSlip()" style="background:none; border:none; color:var(--danger); width:100%; margin-top:10px; cursor:pointer; font-size:11px; opacity: 0.5;">Очистить купон</button>
                 </div>
             </div>
         </aside>
@@ -189,13 +342,12 @@
         const db = getFirestore(app);
         window.db = db;
         window.fb = { doc, getDoc, setDoc, updateDoc, onSnapshot, runTransaction };
-
-        startPage();
     </script>
 
     <script>
         let currentEvent = null;
         let currentUser = null;
+        let selectedMarketName = null;
         let isPlacingBet = false;
 
         const getSlip = () => JSON.parse(localStorage.getItem('visbet_slip') || '[]');
@@ -251,7 +403,7 @@
             if (!pending || pending.fingerprint !== fingerprint) {
                 pending = {
                     fingerprint,
-                    id: `bet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+                    id: String(Date.now()) + String(Math.floor(Math.random() * 900000 + 100000))
                 };
                 localStorage.setItem('visbet_pending_bet', JSON.stringify(pending));
             }
@@ -310,7 +462,7 @@
             const isClosed = currentEvent.status === 'Закрыт';
             
             // Генерация ссылок на логотипы (используем инициалы команд)
-            const getLogo = (name) => `https://api.dicebear.com/7.x/initials/svg?seed=${name}&backgroundColor=00f2ff,0072ff&fontSize=40`;
+            const getLogo = (name) => `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b4d6b,0c7f95,05f3ff&fontSize=48`;
 
             container.innerHTML = `
                 <div class="event-main-info">
@@ -329,25 +481,44 @@
                     ${isClosed ? '<div class="vb-badge danger" style="margin-top:14px;">Ставки закрыты</div>' : ''}
                 </div>
                 
-                ${currentEvent.markets.map(market => `
-                    <div class="market-section">
-                        <span class="market-name">${market.name}</span>
-                        <div class="outcomes-grid">
-                            ${market.outcomes.map(out => {
-                                const isSelected = slip.some(s => s.id === currentEvent.id && s.pick === out.name && s.market === market.name);
-                                return `
-                                    <div class="odd-item ${isSelected ? 'selected' : ''}" 
-                                         ${isClosed ? 'style="opacity:0.35; pointer-events:none;"' : `onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')"`}>
-                                        <span class="odd-label" style="font-weight: 600; font-size: 14px;">${out.name}</span>
-                                        <span class="odd-val">${out.odd}</span>
-                                    </div>
-                                `;
-                            }).join('')}
+                ${(() => {
+                    const marketNames = currentEvent.markets.map(m => m.name);
+                    const activeMarket = selectedMarketName || marketNames[0] || 'Все рынки';
+                    const tabs = ['Все рынки', ...marketNames];
+                    const selectedMarket = currentEvent.markets.find(m => m.name === activeMarket) || currentEvent.markets[0] || {name:'Основной рынок', outcomes:[]};
+                    const marketsToRender = activeMarket === 'Все рынки' ? currentEvent.markets : [selectedMarket];
+                    return `
+                        <div class="market-tabs">
+                            ${tabs.map(name => `
+                                <button class="market-tab ${name === activeMarket ? 'active' : ''}" onclick="selectMarket('${name.replace(/'/g, "\\'")}')">${name}</button>
+                            `).join('')}
                         </div>
-                    </div>
-                `).join('')}
+                        ${marketsToRender.map(market => `
+                            <div class="market-section">
+                                <span class="market-name">${market.name}</span>
+                                <div class="outcomes-grid">
+                                    ${market.outcomes.map(out => {
+                                        const isSelected = slip.some(s => s.id === currentEvent.id && s.pick === out.name && s.market === market.name);
+                                        return `
+                                            <div class="odd-item ${isSelected ? 'selected' : ''}" 
+                                                 ${isClosed ? 'style="opacity:0.35; pointer-events:none;"' : `onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')"`}>
+                                                <span class="odd-label" style="font-weight: 600; font-size: 14px;">${out.name}</span>
+                                                <span class="odd-val">${out.odd}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    `;
+                })()}
             `;
         }
+
+        window.selectMarket = (marketName) => {
+            selectedMarketName = marketName;
+            renderEventDetails();
+        };
 
         window.addToSlip = (id, team, pick, odd, market) => {
             let slip = getSlip();
@@ -382,7 +553,7 @@
                 <div class="glass" style="padding:12px; border-radius:10px; margin-bottom:8px; border-left: 4px solid var(--turquoise);">
                     <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; margin-bottom:5px;">
                         <span>${item.team}</span>
-                        <span onclick="removeFromSlip(${idx})" style="color:#ff4d4d; cursor:pointer; font-size:18px;">&times;</span>
+                        <span onclick="removeFromSlip(${idx})" style="color:var(--danger); cursor:pointer; font-size:18px;">&times;</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:11px;">
                         <span style="opacity:0.6;">${item.market}: <b>${item.pick}</b></span>
@@ -497,6 +668,7 @@
         };
 
         window.addEventListener('storage', () => { renderSlip(); renderEventDetails(); });
+        document.addEventListener('DOMContentLoaded', startPage);
     </script>
 </body>
 </html>

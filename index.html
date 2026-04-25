@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisBET">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="VisBET - профессиональная платформа для ставок на спорт и киберспорт">
+    <meta name="theme-color" content="#0b0e11">
     <title>VisBET | Professional Betting Platform</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* Админ-кнопка */
-        #adminMainButton { background: rgba(255, 77, 77, 0.1); font-weight: bold; transition: 0.3s; }
-        #adminMainButton:hover { background: #ff4d4d; color: #fff !important; }
+        #adminMainButton { background: rgba(251, 113, 133, 0.12); font-weight: bold; transition: 0.3s; color: var(--danger); border-color: var(--danger); }
+        #adminMainButton:hover { background: var(--danger); color: #fff !important; }
 
         /* Экран бана */
         #ban-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; color: #ff4d4d; display: none; 
+            background: #000; color: var(--danger); display: none; 
             flex-direction: column; justify-content: center; align-items: center;
             z-index: 10000; text-align: center; font-family: 'Inter', sans-serif;
         }
@@ -27,51 +29,75 @@
       /* --- СИСТЕМА УВЕДОМЛЕНИЙ (PREMIUM TOASTS) --- */
 #toast-container {
     position: fixed;
-    top: 25px;
+    bottom: 25px;
     right: 25px;
     z-index: 10001;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    pointer-events: none; /* Чтобы контейнер не мешал кликам, пока пуст */
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 14px;
+    pointer-events: none;
 }
 
 .toast {
-    min-width: 320px;
-    padding: 16px 20px;
-    border-radius: 16px;
-    background: rgba(11, 14, 17, 0.85); /* Глубокий темный */
-    backdrop-filter: blur(15px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #fff;
+    min-width: 340px;
+    padding: 18px 22px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(9, 13, 20, 0.92), rgba(13, 19, 35, 0.92));
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #f5faff;
     font-family: 'Inter', sans-serif;
     display: flex;
     align-items: center;
-    gap: 14px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    gap: 16px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.42);
     position: relative;
     overflow: hidden;
-    pointer-events: auto; /* Возвращаем клики для самих уведомлений */
-    
-    /* Анимация появления */
-    animation: toast-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    pointer-events: auto;
+    animation: toast-in 0.55s cubic-bezier(0.18, 1.05, 0.34, 1) forwards;
 }
 
-/* Эффект вылета наружу */
+.toast::before {
+    content: '';
+    position: absolute;
+    top: -25px;
+    right: -25px;
+    width: 175px;
+    height: 175px;
+    background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.18), transparent 60%);
+    pointer-events: none;
+}
+
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: -22px;
+    left: -20px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.12), transparent 55%);
+    pointer-events: none;
+}
+
 .toast.toast-out {
-    animation: toast-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    animation: toast-out 0.42s cubic-bezier(0.7, 0, 0.84, 0) forwards;
 }
 
-/* Иконки с пульсацией */
 .toast-icon {
     font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.12);
+    animation: toast-icon-glow 2.8s ease-in-out infinite;
+    flex-shrink: 0;
 }
 
 .toast-content {
@@ -79,60 +105,97 @@
 }
 
 .toast-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 2px;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin-bottom: 5px;
     display: block;
 }
 
 .toast-msg {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.5;
 }
 
-/* Типы и неоновое свечение */
-.toast.success { 
-    border-left: 4px solid #00ff88; 
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.15), 0 15px 35px rgba(0,0,0,0.4);
-}
-.toast.error { 
-    border-left: 4px solid #ff4d4d; 
-    box-shadow: 0 0 20px rgba(255, 77, 77, 0.15), 0 15px 35px rgba(0,0,0,0.4);
-}
-.toast.info { 
-    border-left: 4px solid #00f2ea; 
-    box-shadow: 0 0 20px rgba(0, 242, 234, 0.15), 0 15px 35px rgba(0,0,0,0.4);
+.toast-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
-/* Прогресс-бар времени */
+.toast-close:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+}
+
+.toast.success {
+    border-left: 4px solid var(--success);
+    box-shadow: 0 0 30px rgba(45, 212, 191, 0.16), 0 22px 55px rgba(0,0,0,0.34);
+}
+
+.toast.error {
+    border-left: 4px solid var(--danger);
+    box-shadow: 0 0 30px rgba(251, 113, 133, 0.18), 0 22px 55px rgba(0,0,0,0.34);
+}
+
+.toast.info {
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 0 30px rgba(56,189,248,0.18), 0 22px 55px rgba(0,0,0,0.34);
+}
+
 .toast-progress {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 3px;
     width: 100%;
-    background: rgba(255, 255, 255, 0.1);
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .toast-progress-bar {
     height: 100%;
     width: 100%;
     transform-origin: left;
+    animation: progress-anim 4s linear forwards;
 }
 
-.success .toast-progress-bar { background: #00ff88; }
-.error .toast-progress-bar { background: #ff4d4d; }
-.info .toast-progress-bar { background: #00f2ea; }
+.toast.success .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(45,212,191,0.95), rgba(4, 110, 139, 0.95));
+}
 
-/* Анимации */
+.toast.error .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(251,113,133,0.95), rgba(159, 30, 60, 0.95));
+}
+
+.toast.info .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(56,189,248,0.95), rgba(20, 99, 122, 0.95));
+}
+
 @keyframes toast-in {
-    0% { transform: translateX(120%) scale(0.9); opacity: 0; }
-    100% { transform: translateX(0) scale(1); opacity: 1; }
+    0% { transform: translateY(110%) scale(0.88); opacity: 0; }
+    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 @keyframes toast-out {
-    0% { transform: translateX(0) scale(1); opacity: 1; }
-    100% { transform: translateX(120%) scale(0.9); opacity: 0; }
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(110%) scale(0.94); opacity: 0; }
+}
+
+@keyframes toast-icon-glow {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(56,189,248,0.12); }
+    50% { transform: scale(1.05); box-shadow: 0 0 24px rgba(56,189,248,0.22); }
 }
 
 @keyframes progress-anim {
@@ -181,9 +244,9 @@
 
         .bet-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .bet-status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-win { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
-        .status-loss { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.3); }
-        .status-pending { background: rgba(255, 204, 0, 0.1); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.3); }
+        .status-win { background: rgba(45, 212, 191, 0.12); color: var(--success); border: 1px solid rgba(45, 212, 191, 0.24); }
+        .status-loss { background: rgba(251, 113, 133, 0.12); color: var(--danger); border: 1px solid rgba(251, 113, 133, 0.24); }
+        .status-pending { background: rgba(56, 189, 248, 0.12); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.24); }
 
         .bet-event-info { margin-bottom: 12px; }
         .bet-event-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; display: block; }
@@ -198,7 +261,7 @@
         
         .potential-win { text-align: right; }
         .potential-win .win-label { font-size: 11px; color: rgba(255,255,255,0.5); }
-        .potential-win .win-val { color: #00ff88; font-weight: 800; display: block; }
+        .potential-win .win-val { color: var(--success); font-weight: 800; display: block; }
 
         .panel-hidden-keep-space { opacity: 0 !important; pointer-events: none !important; user-select: none !important; }
 
@@ -227,8 +290,8 @@
             margin-top: 7px;
             padding: 6px 8px;
             border-radius: 8px;
-            background: rgba(255, 170, 0, 0.12);
-            color: #ffcc66;
+            background: rgba(56,189,248,0.12);
+            color: var(--accent);
             font-size: 11px;
             font-weight: 700;
         }
@@ -249,24 +312,55 @@
     <header class="header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
         <nav class="top-nav" style="display: flex; gap: 10px; margin-left: 20px;">
-            <button class="nav-link active" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span> Линия</button>
-            <button class="nav-link" data-tab="history" onclick="switchMainTab('history')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><path d="M5 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.8-7"/></svg></span> История</button>
-            <button class="nav-link" onclick="location.href='profile.html'"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span> Профиль</button>
+            <button class="nav-link active" data-tab="home" onclick="switchMainTab('home')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5z"/></svg></span> Главная</button>
+            <button class="nav-link" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span> Линия</button>
+            <button class="nav-link" data-tab="live" onclick="switchMainTab('live')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h12M4 19h10"/><path d="M12 8v4l2 2"/></svg></span> Live</button>
+            <button id="historyMainButton" class="nav-link" data-tab="history" onclick="switchMainTab('history')" style="display:none"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><path d="M5 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.8-7"/></svg></span> История</button>
             <button class="nav-link" data-tab="promo" onclick="switchMainTab('promo')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5C11 6 12 7 12 7z"/><path d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5C13 6 12 7 12 7z"/></svg></span> Акции</button>
         </nav>
         <div class="user-info-wrapper" style="display: flex; align-items: center; gap: 15px;">
-            <button id="adminMainButton" class="nav-link" onclick="location.href='admin.html'" style="display: none; color: #ff4d4d; border: 1px solid #ff4d4d; padding: 8px 15px;">Админ-панель</button>
+            <button id="adminMainButton" class="nav-link" onclick="location.href='admin.html'" style="display: none; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px;">Админ-панель</button>
+            <button id="profileMainButton" class="nav-link" onclick="location.href='profile.html'" title="Перейти в профиль" style="display:none">👤 Профиль</button>
             <div id="auth-zone" class="user-info"></div>
         </div>
     </header>
 
-    <div class="main-layout">
+    <div id="tab-home" class="tab-view active">
+        <section class="hero-panel glass">
+            <div class="hero-copy">
+                <h1>Ставки на спорт и киберспорт — быстрее, чем когда-либо</h1>
+                <p>Следи за линиями, ставь на live-матчи и управляй купоном в одном красивом и понятном интерфейсе.</p>
+                <div class="hero-actions">
+                    <button class="btn-submit-bet" onclick="switchMainTab('line')">Открыть линию</button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span>Активных событий</span>
+                    <strong id="hero-events-count">0</strong>
+                    <p>Самые горячие матчи из футбола, киберспорта и других дисциплин.</p>
+                </div>
+                <div class="hero-stat">
+                    <span>Live прямо сейчас</span>
+                    <strong id="hero-live-count">0</strong>
+                    <p>Мгновенный доступ к матчам в реальном времени и динамичным коэффициентам.</p>
+                </div>
+                <div class="hero-stat">
+                    <span>Ставок в купоне</span>
+                    <strong id="hero-bets-count">0</strong>
+                    <p>Ваш купон всегда под рукой — выбирайте исходы и заключайте пари.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="main-layout" style="display:none;">
         <aside id="leftSidebar" class="sidebar glass">
             <h3>Дисциплины</h3>
             <ul id="sportFilter">
-                <li class="active" onclick="filterEvents('Все', this)">Все события</li>
-                <li onclick="filterEvents('Футбол', this)">Футбол</li>
-                <li onclick="filterEvents('Киберспорт', this)">Киберспорт</li>
+                <li class="active" onclick="filterEvents('Все', this, event)">Все события</li>
+                <li onclick="filterEvents('Футбол', this, event)">Футбол</li>
+                <li onclick="filterEvents('Киберспорт', this, event)">Киберспорт</li>
             </ul>
             <div class="line-search">
                 <input type="search" id="line-search" placeholder="Команда или лига" oninput="applyLineFilters()">
@@ -274,8 +368,64 @@
         </aside>
 
         <section class="content-area">
-            <div id="tab-line" class="tab-view active">
-                <h2 id="current-category" style="margin-bottom: 20px; font-weight: 900; text-transform: uppercase;">Линия</h2>
+            <div id="tab-line" class="tab-view">
+                <!-- ИНФОРМАЦИОННЫЕ БЛОКИ -->
+                <div class="info-blocks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--turquoise); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 28px;">🎯</span>
+                            <h3 style="color: var(--turquoise); font-size: 16px; margin: 0;">Топ события</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Самые популярные матчи сегодня</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--turquoise); font-weight: 800; font-size: 14px;" id="top-events-count">0 активных</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--accent); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 28px;">⚡</span>
+                            <h3 style="color: var(--accent); font-size: 16px; margin: 0;">Быстрые ставки</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Экспресс со средним кф. 2.5+</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--accent); font-weight: 800; font-size: 14px;">Средний кф: 2.43</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--warning); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 28px;">�</span>
+                            <h3 style="color: var(--warning); font-size: 16px; margin: 0;">Программа достижений</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Накопите очки и снимите уникальные призы без скрытых условий.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--warning); font-weight: 800; font-size: 14px;">Новые уровни каждую неделю</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- СТАТИСТИКА И РЕКОМЕНДАЦИИ -->
+                <div class="stats-section glass" style="padding: 28px; margin-bottom: 30px; border-left: 4px solid var(--turquoise);">
+                    <h3 style="color: var(--turquoise); font-size: 18px; margin-bottom: 20px; font-weight: 900;">📊 СТАТИСТИКА СЕГОДНЯ</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                        <div style="text-align: center; padding: 16px; background: rgba(0,242,255,0.05); border-radius: 12px; border: 1px solid rgba(0,242,255,0.1);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--turquoise); margin-bottom: 4px;" id="stats-matches">0</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Всего матчей</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: rgba(45,212,191,0.08); border-radius: 12px; border: 1px solid rgba(45,212,191,0.18);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--success); margin-bottom: 4px;" id="stats-sports">3</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Дисциплин</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: rgba(251,191,36,0.08); border-radius: 12px; border: 1px solid rgba(251,191,36,0.18);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--warning); margin-bottom: 4px;" id="stats-avg-odd">2.41</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Средний КФ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ЛИНИЯ СОБЫТИЙ -->
+                <h2 id="current-category" style="margin-bottom: 20px; font-weight: 900; text-transform: uppercase;">🎮 Линия</h2>
                 <div id="eventsContainer"></div>
             </div>
 
@@ -283,12 +433,33 @@
                 <h2 style="margin-bottom: 5px; font-weight: 900;">МОИ СТАВКИ</h2>
                 <div id="historyContainer"></div>
             </div>
-
+            <div id="tab-live" class="tab-view">
+                <h2 style="margin-bottom: 20px; font-weight: 900;">LIVE МАТЧИ</h2>
+                <div id="liveContainer"></div>
+            </div>
             <div id="tab-promo" class="tab-view">
                 <h2 style="margin-bottom: 20px; font-weight: 900;">БОНУСЫ</h2>
-                <div class="glass" style="padding: 30px; border-left: 4px solid var(--turquoise);">
-                    <h3 style="color: var(--turquoise);">Приветственный бонус +100%</h3>
-                    <p style="color: var(--text-muted); margin-top: 10px;">При первом пополнении баланс удваивается автоматически.</p>
+                <div style="display: grid; gap: 16px;">
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--success); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">💎</div>
+                        <h3 style="color: var(--success);">Приветственный бонус +100%</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">При первом пополнении баланс удваивается автоматически. Максимум 50,000 ₽</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Активировать бонус</button>
+                    </div>
+
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--warning); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">⚡</div>
+                        <h3 style="color: var(--warning);">VIP-предложение</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Эксклюзивные условия и привилегии для постоянных игроков.</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Подробнее</button>
+                    </div>
+
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--turquoise); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">🎁</div>
+                        <h3 style="color: var(--turquoise);">Программа лояльности</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Накапливайте очки за каждую ставку и обменивайте на бонусы</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Узнать больше</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -298,30 +469,46 @@
                 <div class="coupon-header">
                     <span class="bet-type-badge" id="bet-type">Ординар</span>
                     <span style="font-size: 14px; font-weight: 700;">КУПОН</span>
+                    <button class="drawer-close" onclick="toggleCouponDrawer(false)" title="Закрыть купон">×</button>
                 </div>
                 <div id="slip-items">
                     <p style="text-align: center; color: var(--text-muted); padding: 20px;">Выберите исход</p>
                 </div>
                 <div id="slip-footer" style="display: none; margin-top: 20px;">
-                    <div id="conflict-warning" style="color: #ff4d4d; font-size: 11px; text-align: center; margin-bottom: 10px; font-weight: bold; display: none; background: rgba(255, 77, 77, 0.1); padding: 8px; border-radius: 8px;">Несколько исходов одного рынка нельзя ставить вместе</div>
-                    
+                    <div id="conflict-warning" style="color: #fb7185; font-size: 11px; text-align: center; margin-bottom: 10px; font-weight: bold; display: none; background: rgba(251,113,133,0.12); padding: 10px; border-radius: 10px;">Несколько исходов одного рынка нельзя ставить вместе</div>
                     <div class="coupon-summary">
                         <input type="number" id="stakeAmount" placeholder="Сумма (₽)" oninput="updateWin()">
-                        <div class="summary-row"><span>Общий Кф:</span><span id="summary-odd" style="color: var(--turquoise); font-weight: 800;">1.00</span></div>
+                        <div class="stake-presets">
+                            <button type="button" onclick="setStakePreset(100)">100</button>
+                            <button type="button" onclick="setStakePreset(250)">250</button>
+                            <button type="button" onclick="setStakePreset(500)">500</button>
+                            <button type="button" onclick="setStakePreset(1000)">1000</button>
+                            <button type="button" onclick="setStakePreset('all')">All-in</button>
+                        </div>
+                        <div class="summary-row"><span>Общий Кф:</span><span id="summary-odd" style="color: var(--accent); font-weight: 800;">1.00</span></div>
                         <div class="summary-row"><span>Выигрыш:</span><span id="winAmount" style="color: var(--success);">0 ₽</span></div>
                     </div>
                     <button class="btn-submit-bet" id="btn-place-bet" onclick="placeOrder()">Заключить пари</button>
-                    <button onclick="clearSlip()" style="background:none; border:none; color:var(--danger); width:100%; margin-top:10px; cursor:pointer; font-size:11px;">Очистить купон</button>
+                    <button onclick="clearSlip()" style="background:none; border:none; color:var(--danger); width:100%; margin-top:10px; cursor:pointer; font-size:12px;">Очистить купон</button>
                 </div>
             </div>
         </aside>
     </div>
+    <div id="couponDrawerBackdrop" onclick="toggleCouponDrawer(false)"></div>
 
     <div class="mobile-tabbar">
-        <button class="active" onclick="switchMainTab('line')">Линия</button>
-        <button onclick="switchMainTab('history')">История</button>
-        <button onclick="location.href='profile.html'">Профиль</button>
-        <button onclick="document.getElementById('rightCoupon')?.scrollIntoView({behavior:'smooth'})">Купон</button>
+        <button class="active" data-tab="home" onclick="switchMainTab('home')">Главная</button>
+        <button data-tab="line" onclick="switchMainTab('line')">Линия</button>
+        <button id="historyMobileButton" data-tab="history" onclick="switchMainTab('history')" style="display:none">История</button>
+        <button id="profileMobileButton" data-tab="profile" onclick="location.href='profile.html'" style="display:none">Профиль</button>
+        <button data-tab="coupon" onclick="toggleCouponDrawer(true)">Купон</button>
+    </div>
+
+    <div id="lottieOverlay" class="lottie-overlay">
+        <div class="lottie-card">
+            <div id="lottiePlayer"></div>
+            <div class="lottie-text"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -342,13 +529,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         window.db = db;
-        // Экспортируем все нужные функции в глобальное окно
         window.fb = { collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot, runTransaction };
-        
-        checkSession();
-        loadEvents(); // Теперь эта функция создает постоянную связь (live)
-        renderSlip();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js" integrity="sha512-8QL4X9jc5GYVhs5MfEUKEDKX1zj+/iYsV1s9uzFak2ujXQiLeOmH1AazHrJHTtDUSzlnSLmkdFQ7OGkJAFG/WA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         let allEvents = [];
@@ -382,8 +565,9 @@ window.showToast = (message, type = 'info', title = '') => {
             <span class="toast-title">${title || currentConfig.defaultTitle}</span>
             <span class="toast-msg">${message}</span>
         </div>
+        <button class="toast-close" type="button">×</button>
         <div class="toast-progress">
-            <div class="toast-progress-bar" style="animation: progress-anim 4s linear forwards"></div>
+            <div class="toast-progress-bar"></div>
         </div>
     `;
 
@@ -392,16 +576,27 @@ window.showToast = (message, type = 'info', title = '') => {
 
     // Функция для удаления уведомления с анимацией
     const removeToast = () => {
-        if (toast.classList.contains('toast-out')) return; // Защита от повторного клика
+        if (toast.classList.contains('toast-out')) return; // Защита от повторного закрытия
         toast.classList.add('toast-out');
-        setTimeout(() => toast.remove(), 400);
+        setTimeout(() => toast.remove(), 420);
     };
 
-    // Закрытие по клику на само уведомление
+    const closeBtn = toast.querySelector('.toast-close');
+    if (closeBtn) {
+        closeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeToast();
+        };
+    }
+
+    // Закрытие по клику на уведомление
     toast.onclick = removeToast;
 
-    // Автоматическое удаление через 4 секунды (время совпадает с анимацией прогресс-бара)
-    setTimeout(removeToast, 4000);
+    // Автоматическое удаление через 4 секунды
+    const timeoutId = setTimeout(removeToast, 4000);
+
+    toast.onmouseenter = () => clearTimeout(timeoutId);
+    toast.onmouseleave = () => setTimeout(removeToast, 1800);
 };
 
         function formatMoney(num) {
@@ -449,7 +644,7 @@ window.showToast = (message, type = 'info', title = '') => {
             if (!pending || pending.fingerprint !== fingerprint) {
                 pending = {
                     fingerprint,
-                    id: `bet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+                    id: String(Date.now()) + String(Math.floor(Math.random() * 900000 + 100000))
                 };
                 localStorage.setItem('visbet_pending_bet', JSON.stringify(pending));
             }
@@ -492,11 +687,26 @@ window.showToast = (message, type = 'info', title = '') => {
         function renderAuthZone(user) {
             const authZone = document.getElementById('auth-zone');
             const adminBtn = document.getElementById('adminMainButton');
+            const profileBtn = document.getElementById('profileMainButton');
+            const historyBtn = document.getElementById('historyMainButton');
+            const profileMobileBtn = document.getElementById('profileMobileButton');
+            const historyMobileBtn = document.getElementById('historyMobileButton');
+            const setAuthVisibility = (visible) => {
+                [profileBtn, historyBtn, profileMobileBtn, historyMobileBtn].forEach(btn => {
+                    if (!btn) return;
+                    btn.style.display = visible ? '' : 'none';
+                });
+            };
+
             if (!user) {
-                authZone.innerHTML = `<button class="btn-submit-bet" onclick="location.href='register.html'">Вход / Регистрация</button>`;
+                setAuthVisibility(false);
+                if (adminBtn) adminBtn.style.display = 'none';
+                authZone.innerHTML = `<button class="btn-submit-bet auth-action" onclick="location.href='register.html'">Вход / Регистрация</button>`;
                 return;
             }
-            if (user.role === 'admin' || user.username.toLowerCase() === 'admin') adminBtn.style.display = 'block';
+
+            setAuthVisibility(true);
+            if (adminBtn) adminBtn.style.display = user.username === 'Admin' ? 'block' : 'none';
             authZone.innerHTML = `
                 <div class="balance">${formatMoney(user.balance)}</div>
                 <div class="username">${user.username}</div>
@@ -551,7 +761,7 @@ window.showToast = (message, type = 'info', title = '') => {
                         <div style="text-align:center"><span class="bet-sum-label">Кф</span><span class="bet-sum-val" style="color:var(--turquoise)">${bet.totalOdd}</span></div>
                         <div class="potential-win">
                             <span class="win-label">${isWin ? 'Выигрыш' : 'Возможный'}</span>
-                            <span class="win-val" style="color:${bet.status === 'Проигрыш' ? '#ff4d4d' : '#00ff88'}">${formatMoney(totalWin)}</span>
+                            <span class="win-val" style="color:${bet.status === 'Проигрыш' ? 'var(--danger)' : 'var(--success)'}">${formatMoney(totalWin)}</span>
                         </div>
                     </div>
                 </div>
@@ -559,19 +769,85 @@ window.showToast = (message, type = 'info', title = '') => {
         }
 
         window.switchMainTab = (tab) => {
-            document.querySelectorAll('.tab-view, .top-nav .nav-link').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.top-nav .nav-link, .mobile-tabbar button').forEach(v => v.classList.remove('active'));
+
+            const mainLayout = document.querySelector('.main-layout');
             const leftSidebar = document.getElementById('leftSidebar');
             const rightCoupon = document.getElementById('rightCoupon');
-            if (tab === 'line') {
-                leftSidebar.classList.remove('panel-hidden-keep-space');
-                rightCoupon.classList.remove('panel-hidden-keep-space');
+
+            if (tab === 'home') {
+                if (mainLayout) mainLayout.style.display = 'none';
+                if (leftSidebar) leftSidebar.classList.add('panel-hidden-keep-space');
+                if (rightCoupon) rightCoupon.classList.add('panel-hidden-keep-space');
             } else {
-                leftSidebar.classList.add('panel-hidden-keep-space');
-                rightCoupon.classList.add('panel-hidden-keep-space');
+                if (mainLayout) mainLayout.style.display = 'grid';
+                if (leftSidebar) leftSidebar.classList.remove('panel-hidden-keep-space');
+                if (rightCoupon) rightCoupon.classList.remove('panel-hidden-keep-space');
             }
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+            const targetTab = document.getElementById('tab-' + tab) || document.getElementById('tab-line');
+            if (targetTab) targetTab.classList.add('active');
+
+            const activeNav = document.querySelector(`.top-nav .nav-link[data-tab="${tab}"]`);
+            if (activeNav) activeNav.classList.add('active');
+
+            const mobileNav = document.querySelector(`.mobile-tabbar button[data-tab="${tab}"]`);
+            if (mobileNav) mobileNav.classList.add('active');
+
             if (tab === 'history') loadHistory();
+            if (tab === 'live') renderLiveEvents();
+            if (tab === 'line') applyLineFilters();
+        };
+
+        window.toggleCouponDrawer = (show) => {
+            const drawer = document.getElementById('rightCoupon');
+            const backdrop = document.getElementById('couponDrawerBackdrop');
+            if (!drawer || !backdrop) return;
+            const isMobile = window.matchMedia('(max-width: 760px)').matches;
+            if (show) {
+                if (isMobile) {
+                    drawer.classList.add('drawer-open');
+                    backdrop.classList.add('visible');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    drawer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            } else {
+                drawer.classList.remove('drawer-open');
+                backdrop.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+        };
+
+        window.setStakePreset = (value) => {
+            const input = document.getElementById('stakeAmount');
+            if (!input) return;
+            if (value === 'all') {
+                const balanceSpan = document.getElementById('display-balance');
+                const available = balanceSpan ? Number(String(balanceSpan.innerText).replace(/[^0-9]/g, '')) : 0;
+                input.value = available || 100;
+            } else {
+                input.value = value;
+            }
+            updateWin();
+            if ('vibrate' in navigator) navigator.vibrate(25);
+        };
+
+        window.showLottieSuccess = () => {
+            const overlay = document.getElementById('lottieOverlay');
+            if (!overlay) return;
+            overlay.classList.add('visible');
+            if (window.lottie && document.getElementById('lottiePlayer')) {
+                window.lottie.loadAnimation({
+                    container: document.getElementById('lottiePlayer'),
+                    renderer: 'svg',
+                    loop: false,
+                    autoplay: true,
+                    path: 'https://assets10.lottiefiles.com/packages/lf20_jbrw3hcz.json'
+                });
+            }
+            setTimeout(() => overlay.classList.remove('visible'), 2200);
         };
 
         window.applyLineFilters = () => {
@@ -595,14 +871,82 @@ window.showToast = (message, type = 'info', title = '') => {
             renderLine(filtered);
         };
 
-        window.filterEvents = (sport, el = null) => {
+        window.filterEvents = (sport, el = null, evt = null) => {
             currentSportFilter = sport;
             document.querySelectorAll('#sportFilter li').forEach(li => li.classList.remove('active'));
-            const target = el || window.event?.target;
+            const target = el || evt?.target;
             if (target) target.classList.add('active');
             document.getElementById('current-category').innerText = sport;
             applyLineFilters();
         };
+
+        function getEventStartDate(ev) {
+            const dateString = ev.date || '';
+            const timeString = ev.time || '';
+            if (!dateString) return null;
+            let datePart = dateString.trim();
+            if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(datePart)) {
+                const [day, month, year] = datePart.split('.').map(Number);
+                return new Date(year, month - 1, day, ...timeString.split(':').map(Number));
+            }
+            const parsed = new Date(`${datePart} ${timeString}`);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function refreshLiveStatus() {
+            const now = Date.now();
+            allEvents.forEach(ev => {
+                const start = getEventStartDate(ev);
+                ev.isLive = false;
+                ev.liveStartsIn = null;
+                if (start) {
+                    const diff = start.getTime() - now;
+                    ev.liveStartsIn = Math.max(0, Math.ceil(diff / 60000));
+                    if (diff <= 5 * 60000 && diff > -120 * 60000) {
+                        ev.isLive = true;
+                    }
+                }
+            });
+            renderLiveEvents();
+        }
+
+        function renderLiveEvents() {
+            const container = document.getElementById('liveContainer');
+            if (!container) return;
+            const liveMatches = allEvents.filter(ev => ev.isLive && ev.status !== 'Закрыт');
+            if (!liveMatches.length) {
+                container.innerHTML = '<p style="opacity:0.6;">Сейчас нет live-матчей. Скоро появятся события, оставшиеся до старта менее 5 минут.</p>';
+                return;
+            }
+            container.innerHTML = liveMatches.map(ev => {
+                const market = ev.markets?.[0] || { outcomes: [] };
+                const badge = `<span class="badge-live">LIVE</span>`;
+                const countdown = ev.liveStartsIn > 0 ? `<span style="opacity:.7;">Начнётся через ${ev.liveStartsIn} мин.</span>` : `<span style="opacity:.7;">В эфире</span>`;
+                return `
+                    <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${escapeJsArg(ev.id)}')">
+                        <div class="match-header" style="font-size:11px; opacity:0.7; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span>${ev.league} | ${ev.date} ${ev.time}</span>
+                            <div style="display:flex; gap:8px; align-items:center;">${badge}${countdown}</div>
+                        </div>
+                        <div class="match-teams-row">
+                            ${getTeamLogo(ev.teams.home)}
+                            <div style="font-size:18px; font-weight:bold; flex:1;">${ev.teams.home} — ${ev.teams.away}</div>
+                            ${getTeamLogo(ev.teams.away)}
+                        </div>
+                        <div class="odds-row" style="display:flex; gap:10px;" onclick="event.stopPropagation()">
+                            ${market.outcomes.map(out => {
+                                const label = out.name || out.label || 'Исход';
+                                return `
+                                    <div class="odd-box" data-event-id="${ev.id}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(ev.teams.home + ' — ' + ev.teams.away)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(market.name || 'Основной рынок')}')">
+                                        <span class="label">${label}</span><span class="val">${out.odd}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         // --- LIVE РЕЖИМ: ЗАГРУЗКА СОБЫТИЙ ЧЕРЕЗ ONSNAPSHOT ---
         async function loadEvents() {
@@ -619,7 +963,9 @@ window.showToast = (message, type = 'info', title = '') => {
                 allEvents = [];
                 snapshot.forEach(doc => allEvents.push({id: doc.id, ...doc.data()}));
                 
+                refreshLiveStatus();
                 applyLineFilters();
+                updateStatsDisplay();
 
                 // Синхронизируем коэффициенты в купоне, если они изменились в базе
                 syncSlipOdds();
@@ -627,6 +973,8 @@ window.showToast = (message, type = 'info', title = '') => {
                 console.error("Snapshot error:", error);
                 container.innerHTML = "<p>Ошибка доступа к данным</p>";
             });
+
+            setInterval(refreshLiveStatus, 30000);
         }
 
         // --- СИНХРОНИЗАЦИЯ КУПОНА ПРИ ИЗМЕНЕНИИ КФ ---
@@ -663,12 +1011,17 @@ window.showToast = (message, type = 'info', title = '') => {
                 const outcomes = market?.outcomes || [];
                 const marketName = market?.name || 'Основной рынок';
                 const teamName = `${ev.teams.home} — ${ev.teams.away}`;
+                const liveBadge = ev.isLive ? '<span class="badge-live">LIVE</span>' : '';
+                const countdown = ev.liveStartsIn !== null && !ev.isLive
+                    ? `<span style="opacity:.6; font-size:12px;">Начнётся через ${ev.liveStartsIn} мин.</span>`
+                    : '';
                 return `
                 <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${escapeJsArg(ev.id)}')">
-                    <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center;">
+                    <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
                         <span>${ev.league} | ${ev.date} ${ev.time}</span>
-                        <span style="background:rgba(0,242,255,0.1); padding:4px 8px; border-radius:5px; color:var(--turquoise)">${ev.sport}</span>
+                        <div style="display:flex; gap:8px; align-items:center;">${liveBadge}<span style="background:rgba(0,242,255,0.1); padding:4px 8px; border-radius:5px; color:var(--turquoise)">${ev.sport}</span></div>
                     </div>
+                    ${countdown ? `<div style="margin-top:8px; color: var(--text-muted);">${countdown}</div>` : ''}
                     <div class="match-teams-row">
                         ${getTeamLogo(ev.teams.home)}
                         <div style="font-size:18px; font-weight:bold; flex:1;">${teamName}</div>
@@ -733,7 +1086,7 @@ window.showToast = (message, type = 'info', title = '') => {
                 <div class="coupon-item" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:5px; border: 1px solid rgba(255,255,255,0.05);">
                     <div class="ci-top" style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
                         <span>${item.team}</span>
-                        <button onclick="removeFromSlip(${idx})" style="background:none; border:none; color:#ff4d4d; cursor:pointer; font-size:16px;">×</button>
+                        <button onclick="removeFromSlip(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;">×</button>
                     </div>
                     <div class="ci-bottom" style="display:flex; justify-content:space-between; margin-top:5px;">
                         <span style="font-size:11px; opacity:0.7;">${item.pick}</span>
@@ -842,6 +1195,9 @@ window.showToast = (message, type = 'info', title = '') => {
                 saveSlip([]);
                 localStorage.removeItem('visbet_pending_bet');
                 showToast("Ставка принята! Удачи!", "success");
+                if ('vibrate' in navigator) navigator.vibrate(50);
+                showLottieSuccess();
+                toggleCouponDrawer(false);
                 // Обновляем данные пользователя без перезагрузки
                 setTimeout(() => checkSession(), 500); 
             } catch (e) {
@@ -853,6 +1209,48 @@ window.showToast = (message, type = 'info', title = '') => {
         };
 
         window.addEventListener('storage', (e) => { if(e.key === 'visbet_slip') renderSlip(); });
+
+        // Функция обновления статистики на главной
+        function updateStatsDisplay() {
+            const activeEvents = allEvents.filter(e => e.status !== 'Закрыт');
+            const matchCount = activeEvents.length;
+            const liveCount = allEvents.filter(e => e.isLive && e.status !== 'Закрыт').length;
+            const avgOdd = activeEvents.reduce((sum, e) => {
+                const outcomes = e.markets?.[0]?.outcomes || [];
+                return sum + (outcomes.length ? outcomes.reduce((s, o) => s + Number(o.odd), 0) / outcomes.length : 0);
+            }, 0) / (activeEvents.length || 1);
+            const betCount = getSlip().length;
+
+            document.getElementById('stats-matches').textContent = matchCount;
+            document.getElementById('top-events-count').textContent = matchCount + ' активных';
+            document.getElementById('stats-avg-odd').textContent = avgOdd.toFixed(2);
+            const heroEvents = document.getElementById('hero-events-count');
+            const heroLive = document.getElementById('hero-live-count');
+            const heroBets = document.getElementById('hero-bets-count');
+            if (heroEvents) heroEvents.textContent = matchCount;
+            if (heroLive) heroLive.textContent = liveCount;
+            if (heroBets) heroBets.textContent = betCount;
+        }
+
+        // Обновляем статистику при загрузке событий
+        setInterval(() => {
+            if (allEvents.length > 0) updateStatsDisplay();
+        }, 5000);
+
+        // === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ===
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                checkSession();
+                loadEvents();
+                renderSlip();
+                updateStatsDisplay();
+            });
+        } else {
+            checkSession();
+            loadEvents();
+            renderSlip();
+            updateStatsDisplay();
+        }
     </script>
  
 </body>

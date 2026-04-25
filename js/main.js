@@ -18,7 +18,82 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stakeInput) {
         stakeInput.addEventListener('input', calculateWin);
     }
+
+    // Initialize mobile touch support
+    initializeMobileSupport();
 });
+
+// --- Mobile Touch Support ---
+function initializeMobileSupport() {
+    // Detect if device is mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        document.documentElement.classList.add('is-mobile');
+        
+        // Prevent default zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Add swipe gesture support for navigation
+        addSwipeSupport();
+    }
+
+    // Optimize for touch: add visual feedback
+    document.addEventListener('touchstart', function(e) {
+        if (e.target.closest('.odd-box, .vb-btn, .nav-link, .mobile-tabbar button, .filter-chip')) {
+            e.target.closest('.odd-box, .vb-btn, .nav-link, .mobile-tabbar button, .filter-chip').style.opacity = '0.7';
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        if (e.target.closest('.odd-box, .vb-btn, .nav-link, .mobile-tabbar button, .filter-chip')) {
+            e.target.closest('.odd-box, .vb-btn, .nav-link, .mobile-tabbar button, .filter-chip').style.opacity = '1';
+        }
+    }, { passive: true });
+
+    // Smooth scroll behavior
+    if ('scrollBehavior' in document.documentElement.style) {
+        document.documentElement.style.scrollBehavior = 'smooth';
+    }
+}
+
+// Swipe gesture support
+let touchStartX = 0;
+let touchEndX = 0;
+
+function addSwipeSupport() {
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+}
+
+function handleSwipe() {
+    const swipeThreshold = 100;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+        // Swipe left - next section
+        if (diff > 0) {
+            // Left swipe
+        }
+        // Swipe right - previous section
+        else {
+            // Right swipe
+        }
+    }
+}
 
 // --- 1. Realtime & Live Engine ---
 function startRealtimeEngine() {
@@ -201,7 +276,110 @@ function openMatchDetails(matchId) {
     window.scrollTo(0, 0);
 }
 
-// --- 5. Логика Купона ---
+// --- 3.5 Live Matches with Countdown ---
+function renderLive() {
+    const container = document.getElementById('liveContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Get matches starting soon (within 5 minutes)
+    const now = new Date();
+    const soonMatches = sportsData.filter(m => {
+        if (m.isLive) return true;
+        
+        // Parse time to check if within 5 minutes
+        const [hours, minutes] = m.time.split(':').map(Number);
+        const matchTime = new Date();
+        matchTime.setHours(hours, minutes, 0);
+        
+        const diffMinutes = (matchTime - now) / (1000 * 60);
+        return diffMinutes >= -5 && diffMinutes <= 5;
+    });
+    
+    if (soonMatches.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); padding: 20px; text-align: center;">Нет активных или скоро начинающихся матчей</p>';
+        return;
+    }
+    
+    soonMatches.forEach(match => {
+        const isLiveNow = match.isLive;
+        const countdownElement = document.createElement('div');
+        countdownElement.className = 'live-match-card glass';
+        countdownElement.dataset.matchId = match.id;
+        countdownElement.innerHTML = `
+            <div style="display: flex; gap: 20px; padding: 20px; align-items: center;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="background: ${isLiveNow ? '#ff4d4d' : '#ffaa00'}; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;">
+                            ${isLiveNow ? 'LIVE' : 'СКОРО'}
+                        </span>
+                        <span style="color: var(--turquoise); font-weight: 700;">${match.league}</span>
+                    </div>
+                    <h3 style="margin: 10px 0; font-size: 18px; font-weight: 900;">
+                        ${match.teams.home} vs ${match.teams.away}
+                    </h3>
+                    <div style="display: flex; gap: 20px; margin: 10px 0;">
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 12px;">Начало:</span>
+                            <div style="font-weight: 700;">${match.date} ${match.time}</div>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted); font-size: 12px;">Коэффициент:</span>
+                            <div style="font-weight: 700; color: var(--turquoise);">${match.markets[0]?.outcomes[0]?.odd || '—'}</div>
+                        </div>
+                    </div>
+                    <div id="countdown-${match.id}" style="color: var(--turquoise); font-weight: 700; font-size: 14px; margin-top: 8px;">
+                        ${isLiveNow ? 'Матч в эфире 🔴' : 'Начинается через...'}
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: 900; color: var(--turquoise); margin-bottom: 10px;">
+                        ${isLiveNow ? `${match.score.home}:${match.score.away}` : '0:0'}
+                    </div>
+                    <button class="btn-submit-bet" onclick="openMatchDetails(${match.id})" style="padding: 10px 20px;">
+                        Ставка
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(countdownElement);
+        
+        if (!isLiveNow) {
+            startCountdown(match.id, match.time);
+        }
+    });
+}
+
+function startCountdown(matchId, matchTime) {
+    const updateCountdown = () => {
+        const countdownEl = document.getElementById(`countdown-${matchId}`);
+        if (!countdownEl) return;
+        
+        const [hours, minutes] = matchTime.split(':').map(Number);
+        const now = new Date();
+        const matchTimeObj = new Date();
+        matchTimeObj.setHours(hours, minutes, 0);
+        
+        const diff = matchTimeObj - now;
+        
+        if (diff <= 0) {
+            countdownEl.innerHTML = 'Матч начался! 🔴';
+            return;
+        }
+        
+        const totalSeconds = Math.floor(diff / 1000);
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        
+        countdownEl.innerHTML = `Начинается через ${mins}:${String(secs).padStart(2, '0')} ⏱️`;
+    };
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+// --- 4. Детальная роспись ---
 function addToCoupon(matchId, matchName, outcomeLabel, odd) {
     const match = sportsData.find(m => m.id === matchId);
     if (match && match.isLocked) {

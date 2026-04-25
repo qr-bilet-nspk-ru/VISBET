@@ -2,7 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisBET Профиль">
+    <meta name="theme-color" content="#0b0e11">
     <title>Профиль | VisBET</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -31,13 +35,43 @@
             border-bottom: 1px solid rgba(255,255,255,0.07);
         }
         .ledger-item:last-child { border-bottom: 0; }
-        .amount-plus { color: #00ff88; font-weight: 900; }
+        .amount-plus { color: var(--success); font-weight: 900; }
         .amount-minus { color: #ff7777; font-weight: 900; }
+
+        /* Tablet optimization */
+        @media (max-width: 1024px) {
+            .profile-shell { padding: 18px 14px 90px; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .profile-name { font-size: 30px; }
+            .profile-balance { font-size: 32px; }
+        }
+
+        /* Mobile optimization */
         @media (max-width: 900px) {
-            .profile-shell { padding: 14px 12px 86px; }
+            .profile-shell { padding: 14px 12px 90px; }
             .profile-hero, .profile-grid { grid-template-columns: 1fr; }
             .profile-name { font-size: 28px; }
             .profile-balance { font-size: 30px; }
+            .profile-bet { padding: 14px; }
+        }
+
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .profile-shell { padding: 12px 10px 90px; }
+            .profile-hero { gap: 12px; margin-bottom: 12px; }
+            .profile-name { font-size: 24px; margin-top: 6px; }
+            .profile-balance { font-size: 26px; margin-top: 8px; }
+            .vb-kicker { font-size: 10px; }
+            .profile-bet { 
+                padding: 12px; 
+                margin-bottom: 8px;
+                border-radius: 12px;
+            }
+            .ledger-item {
+                gap: 8px;
+                padding: 10px 0;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -49,7 +83,9 @@
             <button class="nav-link active"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span> Профиль</button>
             <button class="nav-link" onclick="location.href='admin.html'" id="profile-admin-link" style="display:none;">Админка</button>
         </nav>
-        <div id="auth-zone" class="user-info"></div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <div id="auth-zone" class="user-info"></div>
+        </div>
     </header>
 
     <main class="profile-shell">
@@ -63,7 +99,19 @@
             <div class="vb-card">
                 <span class="vb-kicker">ROI</span>
                 <div class="profile-balance" id="profile-roi">0%</div>
-                <div class="vb-subtle">Расчёт по всем завершённым ставкам: прибыль относительно суммы ставок.</div>
+                <div class="vb-subtle">Расчёт по всем завершённых ставкам: прибыль относительно суммы ставок.</div>
+            </div>
+        </section>
+
+        <section class="vb-card" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; align-items:center; justify-content:space-between;">
+            <div>
+                <span class="vb-kicker">Быстрые действия</span>
+                <div style="color: var(--text-muted);">Все важные операции под рукой.</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="vb-btn secondary" onclick="location.href='register.html'">Пополнить</button>
+                <button class="vb-btn" onclick="location.href='index.html'">Линия</button>
+                <button class="vb-btn" onclick="location.href='index.html?tab=history'">История</button>
             </div>
         </section>
 
@@ -100,13 +148,6 @@
         </section>
     </main>
 
-    <div class="mobile-tabbar">
-        <button onclick="location.href='index.html'">Линия</button>
-        <button class="active">Профиль</button>
-        <button onclick="location.href='index.html';">История</button>
-        <button onclick="location.href='index.html'">Купон</button>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -124,7 +165,7 @@
         const db = getFirestore(app);
         window.db = db;
         window.fb = { collection, getDocs, doc, getDoc, query, where };
-        startProfile();
+
     </script>
 
     <script>
@@ -153,7 +194,7 @@
             if (!snap.exists()) return location.href = 'register.html';
 
             currentUser = snap.data();
-            if (currentUser.role === 'admin' || currentUser.role === 'owner' || currentUser.username?.toLowerCase() === 'admin') {
+            if (currentUser.username === 'Admin') {
                 document.getElementById('profile-admin-link').style.display = 'inline-flex';
             }
             document.getElementById('auth-zone').innerHTML = `
@@ -279,6 +320,8 @@
                 </div>
             `).join('') || `<div class="vb-subtle">Движений баланса пока нет.</div>`;
         };
+
+        document.addEventListener('DOMContentLoaded', startProfile);
     </script>
 </body>
 </html>
