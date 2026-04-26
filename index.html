@@ -237,27 +237,129 @@
         .bet-card {
             background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px; padding: 18px; position: relative;
-            transition: 0.3s; overflow: hidden; margin-bottom: 10px;
+            border-radius: 20px;
+            padding: 22px;
+            transition: 0.3s;
+            overflow: hidden;
+            display: grid;
+            gap: 18px;
+            margin-bottom: 10px;
         }
         .bet-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
 
-        .bet-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
-        .bet-status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bet-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .bet-card-meta {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .bet-card-date {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+
+        .bet-card-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 96px;
+        }
+
+        .bet-status-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
         .status-win { background: rgba(45, 212, 191, 0.12); color: var(--success); border: 1px solid rgba(45, 212, 191, 0.24); }
         .status-loss { background: rgba(251, 113, 133, 0.12); color: var(--danger); border: 1px solid rgba(251, 113, 133, 0.24); }
         .status-pending { background: rgba(56, 189, 248, 0.12); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.24); }
 
-        .bet-event-info { margin-bottom: 12px; }
-        .bet-event-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; display: block; }
-        .bet-event-pick { color: var(--turquoise); font-size: 13px; }
+        .bet-card-items { display: grid; gap: 12px; }
+        .bet-card-item {
+            background: rgba(255,255,255,0.04);
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: grid;
+            gap: 10px;
+        }
+
+        .bet-event-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin: 0;
+            color: var(--white);
+        }
+
+        .bet-event-pick {
+            color: var(--turquoise);
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bet-item-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: rgba(248,250,252,0.76);
+            font-size: 13px;
+        }
+
+        .bet-item-label {
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .bet-item-odd {
+            color: var(--turquoise);
+            font-weight: 800;
+        }
 
         .bet-footer { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+        .bet-summary {
+            display: grid;
+            gap: 6px;
         }
         .bet-sum-label { font-size: 11px; color: rgba(255,255,255,0.5); display: block; }
-        .bet-sum-val { font-size: 16px; font-weight: 700; }
+        .bet-sum-val { font-size: 18px; font-weight: 800; }
+        .potential-win {
+            text-align: right;
+        }
+        .win-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .win-val {
+            font-size: 16px;
+            font-weight: 800;
+        }
         
         .potential-win { text-align: right; }
         .potential-win .win-label { font-size: 11px; color: rgba(255,255,255,0.5); }
@@ -303,7 +405,7 @@
 
     <div id="ban-screen">
         <div class="ban-box">
-            <h1 style="font-size: 50px; margin-bottom: 10px;">⚠</h1>
+            <div style="font-size: 60px; margin-bottom: 10px;"><svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
             <h2>ВАШ АККАУНТ ЗАБЛОКИРОВАН</h2>
             <button onclick="localStorage.clear(); location.href='register.html'" style="padding: 12px 30px; background: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 20px;">ВЕРНУТЬСЯ К РЕГИСТРАЦИИ</button>
         </div>
@@ -313,45 +415,99 @@
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
         <nav class="top-nav" style="display: flex; gap: 10px; margin-left: 20px;">
             <button class="nav-link active" data-tab="home" onclick="switchMainTab('home')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5z"/></svg></span> Главная</button>
-            <button class="nav-link" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span> Линия</button>
+            <button class="nav-link" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></span> Линия</button>
             <button class="nav-link" data-tab="live" onclick="switchMainTab('live')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h12M4 19h10"/><path d="M12 8v4l2 2"/></svg></span> Live</button>
             <button id="historyMainButton" class="nav-link" data-tab="history" onclick="switchMainTab('history')" style="display:none"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><path d="M5 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.8-7"/></svg></span> История</button>
             <button class="nav-link" data-tab="promo" onclick="switchMainTab('promo')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5C11 6 12 7 12 7z"/><path d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5C13 6 12 7 12 7z"/></svg></span> Акции</button>
         </nav>
         <div class="user-info-wrapper" style="display: flex; align-items: center; gap: 15px;">
             <button id="adminMainButton" class="nav-link" onclick="location.href='admin.html'" style="display: none; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px;">Админ-панель</button>
-            <button id="profileMainButton" class="nav-link" onclick="location.href='profile.html'" title="Перейти в профиль" style="display:none">👤 Профиль</button>
+            <button id="profileMainButton" class="nav-link" onclick="location.href='profile.html'" title="Перейти в профиль" style="display:none"><span class="vb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg></span> Профиль</button>
             <div id="auth-zone" class="user-info"></div>
         </div>
     </header>
 
+    <!-- МОБИЛЬНАЯ ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div id="mobileTopBar" class="mobile-top-bar" style="display:none;">
+        <div class="mobile-top-content">
+            <div class="mobile-user-info">
+                <div class="mobile-balance" id="mobileBalance">0 ₽</div>
+                <div class="mobile-username" id="mobileUsername">Гость</div>
+            </div>
+            <button class="mobile-logout-btn" onclick="logout()" title="Выйти">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 3l3 3m0 0l-3 3m3-3H9m0 6h6m0 0l3-3m-3 3l-3 3"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <div id="tab-home" class="tab-view active">
         <section class="hero-panel glass">
             <div class="hero-copy">
-                <h1>Ставки на спорт и киберспорт — быстрее, чем когда-либо</h1>
-                <p>Следи за линиями, ставь на live-матчи и управляй купоном в одном красивом и понятном интерфейсе.</p>
+                <h1>Ставки на спорт и киберспорт</h1>
+                <p>Следи за линиями, ставь на live-матчи и управляй купоном в одном интерфейсе.</p>
                 <div class="hero-actions">
                     <button class="btn-submit-bet" onclick="switchMainTab('line')">Открыть линию</button>
-                </div>
-            </div>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span>Активных событий</span>
-                    <strong id="hero-events-count">0</strong>
-                    <p>Самые горячие матчи из футбола, киберспорта и других дисциплин.</p>
-                </div>
-                <div class="hero-stat">
-                    <span>Live прямо сейчас</span>
-                    <strong id="hero-live-count">0</strong>
-                    <p>Мгновенный доступ к матчам в реальном времени и динамичным коэффициентам.</p>
-                </div>
-                <div class="hero-stat">
-                    <span>Ставок в купоне</span>
-                    <strong id="hero-bets-count">0</strong>
-                    <p>Ваш купон всегда под рукой — выбирайте исходы и заключайте пари.</p>
+                    <button class="btn-link" onclick="switchMainTab('live')">Live матчи</button>
                 </div>
             </div>
         </section>
+
+        <div class="home-layout">
+            <div class="home-left">
+                <div class="home-promo-card glass">
+                    <span class="section-pill">Акции</span>
+                    <h3>Лучшие предложения</h3>
+                    <p>Найди текущие акции, приветственные бонусы и VIP условия. Всё в одном игровом пространстве.</p>
+                    <button class="btn-submit-bet" onclick="switchMainTab('promo')">Перейти к акциям</button>
+                </div>
+
+                <div class="home-info-grid">
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--turquoise); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--turquoise);"><path d="M9 11l3 3L22 4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <h4 style="color: var(--turquoise); font-size: 15px; margin: 0;">Топ события</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Выбери самые интересные матчи прямо сейчас.</p>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--accent); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--accent);"><path d="M2 7h20M2 12h20M2 17h20"/></svg>
+                            <h4 style="color: var(--accent); font-size: 15px; margin: 0;">Быстрые ставки</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Экспрессы и быстрые прогнозы с актуальными коэффициентами.</p>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--warning); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--warning);"><path d="M12 3a9 9 0 1 0 9 9A9 9 0 0 0 12 3zm0 4v5m0 4h.01"/></svg>
+                            <h4 style="color: var(--warning); font-size: 15px; margin: 0;">Приветственный бонус</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0 0 16px; line-height: 1.6;">Получите до 1000 ₽ на первый депозит и начните с выгодой.</p>
+                        <button class="btn-submit-bet" style="width:100%; padding: 14px 0;" onclick="location.href='register.html'">Получить бонус</button>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--success); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--success);"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+                            <h4 style="color: var(--success); font-size: 15px; margin: 0;">VIP бонусы</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Эксклюзивные условия для постоянных игроков.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-right">
+                <div class="home-section-header">
+                    <h2>Популярные события</h2>
+                    <span>Обновлено сейчас</span>
+                </div>
+                <div id="homeEventsContainer" class="events-grid"></div>
+            </div>
+        </div>
+
     </div>
 
     <div class="main-layout" style="display:none;">
@@ -373,7 +529,7 @@
                 <div class="info-blocks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 40px;">
                     <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--turquoise); cursor: pointer; transition: all 0.3s; overflow: hidden;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span style="font-size: 28px;">🎯</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28" style="color: var(--turquoise);"><path d="M9 11l3 3L22 4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <h3 style="color: var(--turquoise); font-size: 16px; margin: 0;">Топ события</h3>
                         </div>
                         <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Самые популярные матчи сегодня</p>
@@ -384,7 +540,7 @@
 
                     <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--accent); cursor: pointer; transition: all 0.3s; overflow: hidden;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <span style="font-size: 28px;">⚡</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28" style="color: var(--accent);"><path d="M2 7h20M2 12h20M2 17h20"/></svg>
                             <h3 style="color: var(--accent); font-size: 16px; margin: 0;">Быстрые ставки</h3>
                         </div>
                         <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Экспресс со средним кф. 2.5+</p>
@@ -407,7 +563,7 @@
 
                 <!-- СТАТИСТИКА И РЕКОМЕНДАЦИИ -->
                 <div class="stats-section glass" style="padding: 28px; margin-bottom: 30px; border-left: 4px solid var(--turquoise);">
-                    <h3 style="color: var(--turquoise); font-size: 18px; margin-bottom: 20px; font-weight: 900;">📊 СТАТИСТИКА СЕГОДНЯ</h3>
+                    <h3 style="color: var(--turquoise); font-size: 18px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="9" width="7" height="12"/></svg> СТАТИСТИКА СЕГОДНЯ</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
                         <div style="text-align: center; padding: 16px; background: rgba(0,242,255,0.05); border-radius: 12px; border: 1px solid rgba(0,242,255,0.1);">
                             <div style="font-size: 32px; font-weight: 900; color: var(--turquoise); margin-bottom: 4px;" id="stats-matches">0</div>
@@ -425,7 +581,12 @@
                 </div>
 
                 <!-- ЛИНИЯ СОБЫТИЙ -->
-                <h2 id="current-category" style="margin-bottom: 20px; font-weight: 900; text-transform: uppercase;">🎮 Линия</h2>
+                <div id="lineFiltersMobile" class="filter-bar" style="display:none; overflow-x:auto; padding-bottom:10px; margin-bottom: 18px;">
+                    <button class="filter-pill active" onclick="filterEvents('Все', this, event)">Все события</button>
+                    <button class="filter-pill" onclick="filterEvents('Футбол', this, event)">Футбол</button>
+                    <button class="filter-pill" onclick="filterEvents('Киберспорт', this, event)">Киберспорт</button>
+                </div>
+                <h2 id="current-category" style="margin-bottom: 20px; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M4 6h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9 11l3 3L19 7" stroke="currentColor" stroke-width="2" fill="none"/></svg> Линия</h2>
                 <div id="eventsContainer"></div>
             </div>
 
@@ -441,21 +602,21 @@
                 <h2 style="margin-bottom: 20px; font-weight: 900;">БОНУСЫ</h2>
                 <div style="display: grid; gap: 16px;">
                     <div class="glass" style="padding: 30px; border-left: 4px solid var(--success); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">💎</div>
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg></div>
                         <h3 style="color: var(--success);">Приветственный бонус +100%</h3>
                         <p style="color: var(--text-muted); margin-top: 10px;">При первом пополнении баланс удваивается автоматически. Максимум 50,000 ₽</p>
                         <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Активировать бонус</button>
                     </div>
 
                     <div class="glass" style="padding: 30px; border-left: 4px solid var(--warning); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">⚡</div>
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M2 7h20M2 12h20M2 17h20"/></svg></div>
                         <h3 style="color: var(--warning);">VIP-предложение</h3>
                         <p style="color: var(--text-muted); margin-top: 10px;">Эксклюзивные условия и привилегии для постоянных игроков.</p>
                         <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Подробнее</button>
                     </div>
 
                     <div class="glass" style="padding: 30px; border-left: 4px solid var(--turquoise); position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;">🎁</div>
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/><circle cx="12" cy="12" r="2" fill="#fff"/></svg></div>
                         <h3 style="color: var(--turquoise);">Программа лояльности</h3>
                         <p style="color: var(--text-muted); margin-top: 10px;">Накапливайте очки за каждую ставку и обменивайте на бонусы</p>
                         <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Узнать больше</button>
@@ -497,11 +658,26 @@
     <div id="couponDrawerBackdrop" onclick="toggleCouponDrawer(false)"></div>
 
     <div class="mobile-tabbar">
-        <button class="active" data-tab="home" onclick="switchMainTab('home')">Главная</button>
-        <button data-tab="line" onclick="switchMainTab('line')">Линия</button>
-        <button id="historyMobileButton" data-tab="history" onclick="switchMainTab('history')" style="display:none">История</button>
-        <button id="profileMobileButton" data-tab="profile" onclick="location.href='profile.html'" style="display:none">Профиль</button>
-        <button data-tab="coupon" onclick="toggleCouponDrawer(true)">Купон</button>
+        <button class="active" data-tab="home" onclick="switchMainTab('home')">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Главная</span>
+        </button>
+        <button data-tab="line" onclick="switchMainTab('line')">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">Линия</span>
+        </button>
+        <button id="historyMobileButton" data-tab="history" onclick="switchMainTab('history')" style="display:none">
+            <span class="tab-icon">🕘</span>
+            <span class="tab-label">История</span>
+        </button>
+        <button id="profileMobileButton" data-tab="profile" onclick="location.href='profile.html'" style="display:none">
+            <span class="tab-icon">👤</span>
+            <span class="tab-label">Профиль</span>
+        </button>
+        <button data-tab="coupon" onclick="toggleCouponDrawer(true)">
+            <span class="tab-icon">🎫</span>
+            <span class="tab-label">Купон</span>
+        </button>
     </div>
 
     <div id="lottieOverlay" class="lottie-overlay">
@@ -552,7 +728,7 @@ window.showToast = (message, type = 'info', title = '') => {
     
     // Настройки иконок и заголовков по умолчанию
     const config = {
-        success: { icon: '⚡', defaultTitle: 'Успешно' },
+        success: { icon: '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>', defaultTitle: 'Успешно' },
         error: { icon: '⚠️', defaultTitle: 'Ошибка' },
         info: { icon: 'ℹ️', defaultTitle: 'Инфо' }
     };
@@ -660,19 +836,38 @@ window.showToast = (message, type = 'info', title = '') => {
             btn.innerText = isBusy ? 'Отправляем...' : 'Заключить пари';
         }
 
+        function escapeCssSelector(value) {
+            if (typeof CSS !== 'undefined' && CSS.escape) return CSS.escape(value);
+            return String(value).replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+        }
+
         function updateSelectedOdds() {
             const slip = getSlip();
-            document.querySelectorAll('.odd-box').forEach(box => box.classList.remove('selected'));
-            slip.forEach(item => {
-                const button = document.querySelector(`.odd-box[data-event-id="${item.id}"][data-pick="${item.pick}"]`);
-                if (button) button.classList.add('selected');
+            const selectedKeys = new Set(slip.map(item => `${item.id}:::${item.market}:::${item.pick}`));
+            document.querySelectorAll('.odd-box').forEach(box => {
+                const id = box.dataset.eventId;
+                const pick = box.dataset.pick;
+                const market = box.dataset.market || 'Основной рынок';
+                const key = `${id}:::${market}:::${pick}`;
+                box.classList.toggle('selected', selectedKeys.has(key));
             });
         }
 
         async function checkSession() {
-            const rawUser = localStorage.getItem('visbet_user');
+            const rawUser = localStorage.getItem('visbet_user')?.trim();
             if (!rawUser) { renderAuthZone(null); return; }
-            if (!window.fb || !window.fb.getDoc) return setTimeout(checkSession, 100);
+
+            // Ждём только если Firebase ещё не инициализирован
+            let attempts = 0;
+            while ((!window.fb || !window.fb.getDoc) && attempts < 20) {
+                await new Promise(r => setTimeout(r, 50));
+                attempts++;
+            }
+            
+            if (!window.fb || !window.fb.getDoc) {
+                console.warn('Firebase не инициализировался');
+                return;
+            }
 
             try {
                 const docSnap = await window.fb.getDoc(window.fb.doc(window.db, "users", rawUser.trim()));
@@ -680,12 +875,18 @@ window.showToast = (message, type = 'info', title = '') => {
                     currentUser = docSnap.data();
                     if (currentUser.isBanned) { document.getElementById('ban-screen').style.display = 'flex'; return; }
                     renderAuthZone(currentUser);
-                } else { logout(); }
+                } else {
+                    localStorage.removeItem('visbet_user');
+                    renderAuthZone(null);
+                }
             } catch (e) { console.error(e); }
         }
 
         function renderAuthZone(user) {
             const authZone = document.getElementById('auth-zone');
+            const mobileTopBar = document.getElementById('mobileTopBar');
+            const mobileBalance = document.getElementById('mobileBalance');
+            const mobileUsername = document.getElementById('mobileUsername');
             const adminBtn = document.getElementById('adminMainButton');
             const profileBtn = document.getElementById('profileMainButton');
             const historyBtn = document.getElementById('historyMainButton');
@@ -701,12 +902,20 @@ window.showToast = (message, type = 'info', title = '') => {
             if (!user) {
                 setAuthVisibility(false);
                 if (adminBtn) adminBtn.style.display = 'none';
+                if (mobileTopBar) mobileTopBar.style.display = 'none';
                 authZone.innerHTML = `<button class="btn-submit-bet auth-action" onclick="location.href='register.html'">Вход / Регистрация</button>`;
                 return;
             }
 
             setAuthVisibility(true);
-            if (adminBtn) adminBtn.style.display = user.username === 'Admin' ? 'block' : 'none';
+            if (adminBtn) adminBtn.style.display = (user.role === 'admin' || user.role === 'owner' || user.username === 'Admin') ? 'block' : 'none';
+            if (mobileTopBar) {
+                mobileTopBar.style.display = 'none';
+                const isMobile = window.matchMedia('(max-width: 760px)').matches;
+                if (isMobile) mobileTopBar.style.display = 'flex';
+            }
+            if (mobileBalance) mobileBalance.textContent = formatMoney(user.balance);
+            if (mobileUsername) mobileUsername.textContent = user.username;
             authZone.innerHTML = `
                 <div class="balance">${formatMoney(user.balance)}</div>
                 <div class="username">${user.username}</div>
@@ -714,7 +923,10 @@ window.showToast = (message, type = 'info', title = '') => {
             `;
         }
 
-        window.logout = () => { localStorage.clear(); location.reload(); };
+        window.logout = () => {
+            localStorage.removeItem('visbet_user');
+            location.reload();
+        };
 
         async function loadHistory() {
             if (!currentUser) return;
@@ -747,18 +959,33 @@ window.showToast = (message, type = 'info', title = '') => {
             return `
                 <div class="bet-card">
                     <div class="bet-card-header">
-                        <span style="font-size:11px; opacity:0.5;">${bet.date}</span>
-                        <span class="bet-status-badge ${statusClass}">${bet.status}</span>
-                    </div>
-                    ${bet.items.map(item => `
-                        <div class="bet-event-info">
-                            <span class="bet-event-name">${item.team}</span>
-                            <span class="bet-event-pick">Выбор: ${item.pick} <span style="opacity:0.5; margin-left:10px;">кф. ${item.odd}</span></span>
+                        <div class="bet-card-meta">
+                            <span class="bet-card-date">${bet.date}</span>
+                            <span class="bet-event-name">Ставка #${bet.id || ''}</span>
                         </div>
-                    `).join('')}
+                        <span class="bet-status-badge ${statusClass} bet-card-status">${bet.status}</span>
+                    </div>
+                    <div class="bet-card-items">
+                        ${bet.items.map(item => `
+                            <div class="bet-card-item">
+                                <span class="bet-event-name">${item.team}</span>
+                                <div class="bet-item-row">
+                                    <span class="bet-event-pick"><span class="bet-item-label">Выбор:</span> ${item.pick}</span>
+                                    <span class="bet-item-odd">кф. ${item.odd}</span>
+                                </div>
+                                ${item.market ? `<div class="bet-item-row"><span class="bet-item-label">Рынок:</span><span>${item.market}</span></div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
                     <div class="bet-footer">
-                        <div><span class="bet-sum-label">Сумма</span><span class="bet-sum-val">${formatMoney(bet.amount)}</span></div>
-                        <div style="text-align:center"><span class="bet-sum-label">Кф</span><span class="bet-sum-val" style="color:var(--turquoise)">${bet.totalOdd}</span></div>
+                        <div class="bet-summary">
+                            <span class="bet-sum-label">Сумма</span>
+                            <span class="bet-sum-val">${formatMoney(bet.amount)}</span>
+                        </div>
+                        <div class="bet-summary">
+                            <span class="bet-sum-label">Коэффициент</span>
+                            <span class="bet-sum-val" style="color:var(--turquoise)">${bet.totalOdd}</span>
+                        </div>
                         <div class="potential-win">
                             <span class="win-label">${isWin ? 'Выигрыш' : 'Возможный'}</span>
                             <span class="win-val" style="color:${bet.status === 'Проигрыш' ? 'var(--danger)' : 'var(--success)'}">${formatMoney(totalWin)}</span>
@@ -775,15 +1002,40 @@ window.showToast = (message, type = 'info', title = '') => {
             const mainLayout = document.querySelector('.main-layout');
             const leftSidebar = document.getElementById('leftSidebar');
             const rightCoupon = document.getElementById('rightCoupon');
+            const lineFiltersMobile = document.getElementById('lineFiltersMobile');
+            const isMobile = window.matchMedia('(max-width: 760px)').matches;
 
             if (tab === 'home') {
                 if (mainLayout) mainLayout.style.display = 'none';
                 if (leftSidebar) leftSidebar.classList.add('panel-hidden-keep-space');
                 if (rightCoupon) rightCoupon.classList.add('panel-hidden-keep-space');
+                if (lineFiltersMobile) lineFiltersMobile.style.display = 'none';
+                renderHomeEvents();
             } else {
                 if (mainLayout) mainLayout.style.display = 'grid';
                 if (leftSidebar) leftSidebar.classList.remove('panel-hidden-keep-space');
                 if (rightCoupon) rightCoupon.classList.remove('panel-hidden-keep-space');
+            }
+
+            if (leftSidebar) {
+                if (tab === 'line') {
+                    leftSidebar.style.display = isMobile ? 'none' : '';
+                } else {
+                    leftSidebar.style.display = 'none';
+                }
+            }
+            if (lineFiltersMobile) {
+                lineFiltersMobile.style.display = isMobile && tab === 'line' ? 'flex' : 'none';
+            }
+
+            if (mainLayout) {
+                if (isMobile) {
+                    mainLayout.style.gridTemplateColumns = '';
+                } else if (tab === 'line') {
+                    mainLayout.style.gridTemplateColumns = '260px 1fr 340px';
+                } else {
+                    mainLayout.style.gridTemplateColumns = '1fr 340px';
+                }
             }
 
             const targetTab = document.getElementById('tab-' + tab) || document.getElementById('tab-line');
@@ -799,6 +1051,70 @@ window.showToast = (message, type = 'info', title = '') => {
             if (tab === 'live') renderLiveEvents();
             if (tab === 'line') applyLineFilters();
         };
+
+        function findMarket(ev, patterns) {
+            if (!Array.isArray(ev.markets)) return null;
+            const regexes = patterns.map(p => new RegExp(p, 'i'));
+            return ev.markets.find(m => regexes.some(re => re.test(m.name || '')));
+        }
+
+        function renderOddsRow(ev, market, labelOverride) {
+            const outcomes = market?.outcomes || [];
+            const marketName = market?.name || 'Основной рынок';
+            const label = labelOverride || marketName;
+            return `
+                <div class="market-block">
+                    <div class="market-title">${label}</div>
+                    <div class="odds-row" style="display:flex; gap:8px; overflow-x: auto; -webkit-overflow-scrolling: touch;" onclick="event.stopPropagation()">
+                        ${outcomes.slice(0, 3).map(out => {
+                            const outcomeLabel = out.name || out.label || 'Исход';
+                            return `
+                                <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(marketName)}" data-pick="${outcomeLabel}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(`${ev.teams.home} — ${ev.teams.away}`)}', '${escapeJsArg(outcomeLabel)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')" style="min-width: 90px;">
+                                    <span class="label">${outcomeLabel}</span><span class="val">${out.odd}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHomeEvents() {
+            const container = document.getElementById('homeEventsContainer');
+            if (!container) return;
+            
+            const topEvents = allEvents.filter(ev => ev.status !== 'Закрыт').slice(0, 3);
+            
+            if (topEvents.length === 0) {
+                container.innerHTML = "<p style='opacity:0.5; text-align: center; padding: 20px;'>Нет активных событий</p>";
+                return;
+            }
+            
+            container.innerHTML = topEvents.map(ev => {
+                const teamName = `${ev.teams.home} — ${ev.teams.away}`;
+                const liveBadge = ev.isLive ? '<span class="badge-live">LIVE</span>' : '';
+                const mainMarket = findMarket(ev, ['1x2','п1.*x.*п2','п1.*х.*п2','исход','результат','match result']) || ev.markets?.[0];
+                const bttsMarket = findMarket(ev, ['обе забьют','both teams','btts']);
+                const dcMarket = findMarket(ev, ['двойной шанс','double chance']);
+                return `
+                    <div class="match-card home-event-card glass animation-fade" onclick="openMatch('${escapeJsArg(ev.id)}')">
+                        <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span>${ev.league} | ${ev.date}</span>
+                            <div style="display:flex; gap:6px; align-items:center;">${liveBadge}<span style="background:rgba(0,242,255,0.1); padding:3px 6px; border-radius:4px; color:var(--turquoise); font-size:10px;">${ev.sport}</span></div>
+                        </div>
+                        <div class="match-teams-row" style="margin-bottom:10px;">
+                            ${getTeamLogo(ev.teams.home)}
+                            <div style="font-size:16px; font-weight:bold; flex:1; text-align:center;">${teamName}</div>
+                            ${getTeamLogo(ev.teams.away)}
+                        </div>
+                        ${renderOddsRow(ev, mainMarket, 'П1 × Х × П2')}
+                        ${bttsMarket ? renderOddsRow(ev, bttsMarket, 'Обе забьют') : ''}
+                        ${dcMarket ? renderOddsRow(ev, dcMarket, 'Двойной шанс') : ''}
+                    </div>
+                `;
+            }).join('');
+            updateSelectedOdds();
+        }
 
         window.toggleCouponDrawer = (show) => {
             const drawer = document.getElementById('rightCoupon');
@@ -937,7 +1253,7 @@ window.showToast = (message, type = 'info', title = '') => {
                             ${market.outcomes.map(out => {
                                 const label = out.name || out.label || 'Исход';
                                 return `
-                                    <div class="odd-box" data-event-id="${ev.id}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(ev.teams.home + ' — ' + ev.teams.away)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(market.name || 'Основной рынок')}')">
+                                    <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(market.name || 'Основной рынок')}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(ev.teams.home + ' — ' + ev.teams.away)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(market.name || 'Основной рынок')}')">
                                         <span class="label">${label}</span><span class="val">${out.odd}</span>
                                     </div>
                                 `;
@@ -954,7 +1270,18 @@ window.showToast = (message, type = 'info', title = '') => {
             // Показываем скелетоны только при самой первой загрузке
             container.innerHTML = `<div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>`;
 
-            if(!window.fb || !window.fb.onSnapshot) return setTimeout(loadEvents, 500);
+            // Ждём инициализации Firebase (максимум 1 секунда)
+            let attempts = 0;
+            while ((!window.fb || !window.fb.onSnapshot) && attempts < 20) {
+                await new Promise(r => setTimeout(r, 50));
+                attempts++;
+            }
+            
+            if (!window.fb || !window.fb.onSnapshot) {
+                console.warn('Firebase не инициализировался');
+                container.innerHTML = "<p>Ошибка доступа к данным</p>";
+                return;
+            }
             
             const q = window.fb.collection(window.db, "events");
 
@@ -965,9 +1292,9 @@ window.showToast = (message, type = 'info', title = '') => {
                 
                 refreshLiveStatus();
                 applyLineFilters();
+                renderHomeEvents();
+                renderLiveEvents();
                 updateStatsDisplay();
-
-                // Синхронизируем коэффициенты в купоне, если они изменились в базе
                 syncSlipOdds();
             }, (error) => {
                 console.error("Snapshot error:", error);
@@ -1031,7 +1358,7 @@ window.showToast = (message, type = 'info', title = '') => {
                         ${outcomes.map(out => {
                             const label = out.name || out.label || 'Исход';
                             return `
-                                <div class="odd-box" data-event-id="${ev.id}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(teamName)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')">
+                                <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(marketName)}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(teamName)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')">
                                     <span class="label">${label}</span><span class="val">${out.odd}</span>
                                 </div>
                             `;
@@ -1232,24 +1559,36 @@ window.showToast = (message, type = 'info', title = '') => {
             if (heroBets) heroBets.textContent = betCount;
         }
 
-        // Обновляем статистику при загрузке событий
-        setInterval(() => {
-            if (allEvents.length > 0) updateStatsDisplay();
-        }, 5000);
+        // Обновляем статистику при загрузке событий (убрали ненужный setInterval)
+        // Статистика теперь обновляется автоматически через onSnapshot в loadEvents()
 
-        // === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ===
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                checkSession();
-                loadEvents();
+        function getInitialTab() {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            const valid = ['home', 'line', 'history', 'live', 'promo'];
+            return valid.includes(tab) ? tab : 'home';
+        }
+
+        // === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ (ПАРАЛЛЕЛЬНАЯ ЗАГРУЗКА) ===
+        const initApp = async () => {
+            try {
+                // Загружаем данные параллельно, не ждя друг друга
+                await Promise.all([
+                    checkSession(),
+                    loadEvents()
+                ]);
                 renderSlip();
                 updateStatsDisplay();
-            });
+                switchMainTab(getInitialTab());
+            } catch (e) {
+                console.error('Ошибка инициализации:', e);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
         } else {
-            checkSession();
-            loadEvents();
-            renderSlip();
-            updateStatsDisplay();
+            initApp();
         }
     </script>
  

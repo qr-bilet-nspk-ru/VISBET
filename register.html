@@ -675,7 +675,7 @@
         checkCurrentSession();
 
         // Удалить формочку если пользователь уже залогинен и не забанен
-        const savedUser = localStorage.getItem('visbet_user');
+        const savedUser = localStorage.getItem('visbet_user')?.trim();
         if (savedUser) {
             getDoc(doc(db, "users", savedUser)).then(snap => {
                 if (snap.exists() && !snap.data().isBanned) {

@@ -152,8 +152,15 @@
         .odd-item.selected {
             background: var(--turquoise);
             border-color: var(--turquoise);
+            box-shadow: 0 0 16px rgba(56,189,248,0.35);
         }
-        .odd-item.selected span { color: #000 !important; }
+        .odd-item.selected span {
+            color: #000 !important;
+            font-weight: 800;
+        }
+        .odd-item.selected:hover {
+            background: rgba(45,212,191,0.9);
+        }
 
         .conflict-msg { 
             color: var(--danger); font-size: 11px; text-align: center; 
@@ -305,6 +312,7 @@
                 <div class="coupon-header">
                     <span class="bet-type-badge" id="bet-type">Ординар</span>
                     <span style="font-size: 14px; font-weight: 700;">КУПОН</span>
+                    <button class="drawer-close" onclick="toggleCouponDrawer(false)" title="Закрыть купон">×</button>
                 </div>
                 <div id="slip-items"></div>
                 <div id="slip-footer" style="display: none; margin-top: 20px;">
@@ -324,6 +332,9 @@
             </div>
         </aside>
     </div>
+
+    <button id="openCouponButton" class="mobile-coupon-button" onclick="toggleCouponDrawer(true)">Купон</button>
+    <div id="couponDrawerBackdrop" onclick="toggleCouponDrawer(false)"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -356,6 +367,14 @@
             renderSlip();
             renderEventDetails(); // Перерисовываем, чтобы подсветить выбранные кнопки
         };
+
+        function escapeJsArg(value) {
+            return String(value || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/\n/g, '')
+                .replace(/\r/g, '');
+        }
 
         function hasSlipConflict(slip) {
             const seenMatches = {};
@@ -490,7 +509,7 @@
                     return `
                         <div class="market-tabs">
                             ${tabs.map(name => `
-                                <button class="market-tab ${name === activeMarket ? 'active' : ''}" onclick="selectMarket('${name.replace(/'/g, "\\'")}')">${name}</button>
+                                <button class="market-tab ${name === activeMarket ? 'active' : ''}" onclick="selectMarket('${escapeJsArg(name)}')">${name}</button>
                             `).join('')}
                         </div>
                         ${marketsToRender.map(market => `
@@ -501,7 +520,7 @@
                                         const isSelected = slip.some(s => s.id === currentEvent.id && s.pick === out.name && s.market === market.name);
                                         return `
                                             <div class="odd-item ${isSelected ? 'selected' : ''}" 
-                                                 ${isClosed ? 'style="opacity:0.35; pointer-events:none;"' : `onclick="addToSlip('${currentEvent.id}', '${currentEvent.teams.home} — ${currentEvent.teams.away}', '${out.name}', ${out.odd}, '${market.name}')"`}>
+                                                 ${isClosed ? 'style="opacity:0.35; pointer-events:none;"' : `onclick="addToSlip('${escapeJsArg(currentEvent.id)}', '${escapeJsArg(currentEvent.teams.home + ' — ' + currentEvent.teams.away)}', '${escapeJsArg(out.name)}', ${out.odd}, '${escapeJsArg(market.name)}')"`}>
                                                 <span class="odd-label" style="font-weight: 600; font-size: 14px;">${out.name}</span>
                                                 <span class="odd-val">${out.odd}</span>
                                             </div>
@@ -664,6 +683,25 @@
             } finally {
                 isPlacingBet = false;
                 setPlaceOrderBusy(false);
+            }
+        };
+
+        window.toggleCouponDrawer = (show) => {
+            const drawer = document.getElementById('rightCoupon');
+            const backdrop = document.getElementById('couponDrawerBackdrop');
+            if (!drawer || !backdrop) return;
+            const isMobile = window.matchMedia('(max-width: 760px)').matches;
+            if (show) {
+                drawer.classList.add('drawer-open');
+                backdrop.classList.add('visible');
+                if (isMobile) {
+                    document.body.style.overflow = 'hidden';
+                }
+                drawer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } else {
+                drawer.classList.remove('drawer-open');
+                backdrop.classList.remove('visible');
+                document.body.style.overflow = '';
             }
         };
 

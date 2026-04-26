@@ -92,7 +92,10 @@
         <section class="profile-hero">
             <div class="vb-card">
                 <span class="vb-kicker">Игровой профиль</span>
-                <div class="profile-name" id="profile-name">Гость</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:8px;">
+                    <div class="profile-name" id="profile-name">Гость</div>
+                    <button class="vb-btn secondary" style="padding: 10px 14px; font-size: 12px; min-height: auto;" onclick="logoutProfile()">Выйти</button>
+                </div>
                 <div class="vb-subtle" id="profile-meta">Войдите, чтобы видеть статистику</div>
                 <div class="profile-balance" id="profile-balance">0 ₽</div>
             </div>
@@ -148,6 +151,29 @@
         </section>
     </main>
 
+    <div class="mobile-tabbar">
+        <button data-tab="home" onclick="location.href='index.html'">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Главная</span>
+        </button>
+        <button data-tab="line" onclick="location.href='index.html?tab=line'">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">Линия</span>
+        </button>
+        <button data-tab="history" onclick="location.href='index.html?tab=history'">
+            <span class="tab-icon">🕘</span>
+            <span class="tab-label">История</span>
+        </button>
+        <button class="active" data-tab="profile" onclick="location.href='profile.html'">
+            <span class="tab-icon">👤</span>
+            <span class="tab-label">Профиль</span>
+        </button>
+        <button data-tab="coupon" onclick="location.href='index.html?tab=line'">
+            <span class="tab-icon">🎫</span>
+            <span class="tab-label">Купон</span>
+        </button>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -194,13 +220,13 @@
             if (!snap.exists()) return location.href = 'register.html';
 
             currentUser = snap.data();
-            if (currentUser.username === 'Admin') {
+            if (currentUser.role === 'admin' || currentUser.role === 'owner' || currentUser.username === 'Admin') {
                 document.getElementById('profile-admin-link').style.display = 'inline-flex';
             }
             document.getElementById('auth-zone').innerHTML = `
                 <div class="balance">${formatMoney(currentUser.balance)}</div>
                 <div class="username">${currentUser.username}</div>
-                <button class="btn-logout" onclick="localStorage.clear(); location.href='index.html'">Выйти</button>
+                <button class="btn-logout" onclick="logoutProfile()">Выйти</button>
             `;
 
             await Promise.all([loadBets(), loadLedger()]);
@@ -254,6 +280,11 @@
             document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
             renderProfile();
+        };
+
+        window.logoutProfile = () => {
+            localStorage.removeItem('visbet_user');
+            location.href = 'index.html';
         };
 
         window.renderProfile = () => {

@@ -1156,7 +1156,12 @@
         window.openTab = (e, t) => {
             document.querySelectorAll('.content-box, .nav-btn').forEach(x => x.classList.remove('active'));
             document.getElementById(t).classList.add('active');
-            if(e) e.currentTarget.classList.add('active');
+            if (e) {
+                e.currentTarget.classList.add('active');
+            } else {
+                const fallbackButton = document.querySelector(`.nav-btn[onclick*="'${t}'"]`);
+                if (fallbackButton) fallbackButton.classList.add('active');
+            }
             if(t === 'tab-dashboard') loadDashboard(); if(t === 'tab-line') loadLine(); if(t === 'tab-bets') loadBets(); if(t === 'tab-users') loadUsers(); if(t === 'tab-audit') loadAudit();
         };
 

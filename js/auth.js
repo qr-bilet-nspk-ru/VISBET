@@ -124,10 +124,17 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// Ждем инициализации Firebase из HTML, потом запускаем проверку
-setTimeout(() => {
+// Инициализируем Firebase сразу при загрузке, не дожидаясь задержек
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        if(window.db) {
+            ensureAdminExists().catch(console.error);
+            checkAuth();
+        }
+    });
+} else {
     if(window.db) {
-        ensureAdminExists();
+        ensureAdminExists().catch(console.error);
         checkAuth();
     }
-}, 1000);
+}
