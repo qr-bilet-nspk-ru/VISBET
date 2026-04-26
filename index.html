@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisBET">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="VisBET - профессиональная платформа для ставок на спорт и киберспорт">
+    <meta name="theme-color" content="#0b0e11">
+    <title>VisBET | Professional Betting Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Админ-кнопка */
+        #adminMainButton { background: rgba(251, 113, 133, 0.12); font-weight: bold; transition: 0.3s; color: var(--danger); border-color: var(--danger); }
+        #adminMainButton:hover { background: var(--danger); color: #fff !important; }
+
+        /* Экран бана */
+        #ban-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; color: var(--danger); display: none; 
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; text-align: center; font-family: 'Inter', sans-serif;
+        }
+
+      
+      /* --- СИСТЕМА УВЕДОМЛЕНИЙ (PREMIUM TOASTS) --- */
+#toast-container {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 14px;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 340px;
+    padding: 18px 22px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(9, 13, 20, 0.92), rgba(13, 19, 35, 0.92));
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #f5faff;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.42);
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    animation: toast-in 0.55s cubic-bezier(0.18, 1.05, 0.34, 1) forwards;
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    top: -25px;
+    right: -25px;
+    width: 175px;
+    height: 175px;
+    background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.18), transparent 60%);
+    pointer-events: none;
+}
+
+.toast::after {
+    content: '';
+    position: absolute;
+    bottom: -22px;
+    left: -20px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.12), transparent 55%);
+    pointer-events: none;
+}
+
+.toast.toast-out {
+    animation: toast-out 0.42s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+.toast-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.12);
+    animation: toast-icon-glow 2.8s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.toast-msg {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.5;
+}
+
+.toast-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.toast-close:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+}
+
+.toast.success {
+    border-left: 4px solid var(--success);
+    box-shadow: 0 0 30px rgba(45, 212, 191, 0.16), 0 22px 55px rgba(0,0,0,0.34);
+}
+
+.toast.error {
+    border-left: 4px solid var(--danger);
+    box-shadow: 0 0 30px rgba(251, 113, 133, 0.18), 0 22px 55px rgba(0,0,0,0.34);
+}
+
+.toast.info {
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 0 30px rgba(56,189,248,0.18), 0 22px 55px rgba(0,0,0,0.34);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    transform-origin: left;
+    animation: progress-anim 4s linear forwards;
+}
+
+.toast.success .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(45,212,191,0.95), rgba(4, 110, 139, 0.95));
+}
+
+.toast.error .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(251,113,133,0.95), rgba(159, 30, 60, 0.95));
+}
+
+.toast.info .toast-progress-bar {
+    background: linear-gradient(90deg, rgba(56,189,248,0.95), rgba(20, 99, 122, 0.95));
+}
+
+@keyframes toast-in {
+    0% { transform: translateY(110%) scale(0.88); opacity: 0; }
+    60% { transform: translateY(-8px) scale(1.02); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes toast-out {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(110%) scale(0.94); opacity: 0; }
+}
+
+@keyframes toast-icon-glow {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 16px rgba(56,189,248,0.12); }
+    50% { transform: scale(1.05); box-shadow: 0 0 24px rgba(56,189,248,0.22); }
+}
+
+@keyframes progress-anim {
+    0% { transform: scaleX(1); }
+    100% { transform: scaleX(0); }
+}
+
+        /* --- ВИЗУАЛЬНЫЕ СОЧНОСТИ --- */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card { height: 140px; margin-bottom: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .team-logo {
+            width: 32px; height: 32px; background: var(--turquoise); color: #000;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800; text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); flex-shrink: 0;
+        }
+
+        .match-teams-row { display: flex; align-items: center; gap: 15px; margin: 15px 0; }
+
+        .history-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+        .history-section-title { 
+            font-size: 14px; color: var(--turquoise); letter-spacing: 1px; 
+            margin: 20px 0 10px; text-transform: uppercase; opacity: 0.8;
+            border-bottom: 1px solid rgba(0,242,255,0.2); padding-bottom: 5px;
+        }
+
+        .bet-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 22px;
+            transition: 0.3s;
+            overflow: hidden;
+            display: grid;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+        .bet-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+        .bet-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .bet-card-meta {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .bet-card-date {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+
+        .bet-card-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 96px;
+        }
+
+        .bet-status-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .status-win { background: rgba(45, 212, 191, 0.12); color: var(--success); border: 1px solid rgba(45, 212, 191, 0.24); }
+        .status-loss { background: rgba(251, 113, 133, 0.12); color: var(--danger); border: 1px solid rgba(251, 113, 133, 0.24); }
+        .status-pending { background: rgba(56, 189, 248, 0.12); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.24); }
+
+        .bet-card-items { display: grid; gap: 12px; }
+        .bet-card-item {
+            background: rgba(255,255,255,0.04);
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: grid;
+            gap: 10px;
+        }
+
+        .bet-event-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin: 0;
+            color: var(--white);
+        }
+
+        .bet-event-pick {
+            color: var(--turquoise);
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bet-item-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: rgba(248,250,252,0.76);
+            font-size: 13px;
+        }
+
+        .bet-item-label {
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .bet-item-odd {
+            color: var(--turquoise);
+            font-weight: 800;
+        }
+
+        .bet-footer { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+        }
+        .bet-summary {
+            display: grid;
+            gap: 6px;
+        }
+        .bet-sum-label { font-size: 11px; color: rgba(255,255,255,0.5); display: block; }
+        .bet-sum-val { font-size: 18px; font-weight: 800; }
+        .potential-win {
+            text-align: right;
+        }
+        .win-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .win-val {
+            font-size: 16px;
+            font-weight: 800;
+        }
+        
+        .potential-win { text-align: right; }
+        .potential-win .win-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+        .potential-win .win-val { color: var(--success); font-weight: 800; display: block; }
+
+        .panel-hidden-keep-space { opacity: 0 !important; pointer-events: none !important; user-select: none !important; }
+
+        .odd-box { cursor: pointer; transition: 0.2s; position: relative; }
+        .odd-box:hover { background: rgba(0, 242, 255, 0.1); border-color: var(--turquoise); }
+        
+        .odd-box.selected { background: var(--turquoise) !important; border-color: var(--turquoise) !important; }
+        .odd-box.selected .label, .odd-box.selected .val { color: #000 !important; font-weight: 800; }
+
+        .line-search {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .line-search input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.25);
+            color: #fff;
+            outline: none;
+        }
+        .line-search input:focus { border-color: var(--turquoise); }
+        .odds-change {
+            margin-top: 7px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(56,189,248,0.12);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div id="ban-screen">
+        <div class="ban-box">
+            <div style="font-size: 60px; margin-bottom: 10px;"><svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <h2>ВАШ АККАУНТ ЗАБЛОКИРОВАН</h2>
+            <button onclick="localStorage.clear(); location.href='register.html'" style="padding: 12px 30px; background: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 20px;">ВЕРНУТЬСЯ К РЕГИСТРАЦИИ</button>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
+        <nav class="top-nav" style="display: flex; gap: 10px; margin-left: 20px;">
+            <button class="nav-link active" data-tab="home" onclick="switchMainTab('home')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5z"/></svg></span> Главная</button>
+            <button class="nav-link" data-tab="line" onclick="switchMainTab('line')"><span class="vb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></span> Линия</button>
+            <button class="nav-link" data-tab="live" onclick="switchMainTab('live')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h12M4 19h10"/><path d="M12 8v4l2 2"/></svg></span> Live</button>
+            <button id="historyMainButton" class="nav-link" data-tab="history" onclick="switchMainTab('history')" style="display:none"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><path d="M5 5v5h5"/><path d="M5.5 15a7 7 0 1 0 1.8-7"/></svg></span> История</button>
+            <button class="nav-link" data-tab="promo" onclick="switchMainTab('promo')"><span class="vb-icon"><svg viewBox="0 0 24 24"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H8.5a2.5 2.5 0 1 1 2.5-2.5C11 6 12 7 12 7z"/><path d="M12 7h3.5A2.5 2.5 0 1 0 13 4.5C13 6 12 7 12 7z"/></svg></span> Акции</button>
+        </nav>
+        <div class="user-info-wrapper" style="display: flex; align-items: center; gap: 15px;">
+            <button id="adminMainButton" class="nav-link" onclick="location.href='admin.html'" style="display: none; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px;">Админ-панель</button>
+            <button id="profileMainButton" class="nav-link" onclick="location.href='profile.html'" title="Перейти в профиль" style="display:none"><span class="vb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg></span> Профиль</button>
+            <div id="auth-zone" class="user-info"></div>
+        </div>
+    </header>
+
+    <!-- МОБИЛЬНАЯ ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div id="mobileTopBar" class="mobile-top-bar" style="display:none;">
+        <div class="mobile-top-content">
+            <div class="mobile-user-info">
+                <div class="mobile-balance" id="mobileBalance">0 ₽</div>
+                <div class="mobile-username" id="mobileUsername">Гость</div>
+            </div>
+            <button class="mobile-logout-btn" onclick="logout()" title="Выйти">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 3l3 3m0 0l-3 3m3-3H9m0 6h6m0 0l3-3m-3 3l-3 3"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="tab-home" class="tab-view active">
+        <section class="hero-panel glass">
+            <div class="hero-copy">
+                <h1>Ставки на спорт и киберспорт</h1>
+                <p>Следи за линиями, ставь на live-матчи и управляй купоном в одном интерфейсе.</p>
+                <div class="hero-actions">
+                    <button class="btn-submit-bet" onclick="switchMainTab('line')">Открыть линию</button>
+                    <button class="btn-link" onclick="switchMainTab('live')">Live матчи</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="home-layout">
+            <div class="home-left">
+                <div class="home-promo-card glass">
+                    <span class="section-pill">Акции</span>
+                    <h3>Лучшие предложения</h3>
+                    <p>Найди текущие акции, приветственные бонусы и VIP условия. Всё в одном игровом пространстве.</p>
+                    <button class="btn-submit-bet" onclick="switchMainTab('promo')">Перейти к акциям</button>
+                </div>
+
+                <div class="home-info-grid">
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--turquoise); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--turquoise);"><path d="M9 11l3 3L22 4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <h4 style="color: var(--turquoise); font-size: 15px; margin: 0;">Топ события</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Выбери самые интересные матчи прямо сейчас.</p>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--accent); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--accent);"><path d="M2 7h20M2 12h20M2 17h20"/></svg>
+                            <h4 style="color: var(--accent); font-size: 15px; margin: 0;">Быстрые ставки</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Экспрессы и быстрые прогнозы с актуальными коэффициентами.</p>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--warning); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--warning);"><path d="M12 3a9 9 0 1 0 9 9A9 9 0 0 0 12 3zm0 4v5m0 4h.01"/></svg>
+                            <h4 style="color: var(--warning); font-size: 15px; margin: 0;">Приветственный бонус</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0 0 16px; line-height: 1.6;">Получите до 1000 ₽ на первый депозит и начните с выгодой.</p>
+                        <button class="btn-submit-bet" style="width:100%; padding: 14px 0;" onclick="location.href='register.html'">Получить бонус</button>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--success); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: var(--success);"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+                            <h4 style="color: var(--success); font-size: 15px; margin: 0;">VIP бонусы</h4>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0; line-height: 1.6;">Эксклюзивные условия для постоянных игроков.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-right">
+                <div class="home-section-header">
+                    <h2>Популярные события</h2>
+                    <span>Обновлено сейчас</span>
+                </div>
+                <div id="homeEventsContainer" class="events-grid"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="main-layout" style="display:none;">
+        <aside id="leftSidebar" class="sidebar glass">
+            <h3>Дисциплины</h3>
+            <ul id="sportFilter">
+                <li class="active" onclick="filterEvents('Все', this, event)">Все события</li>
+                <li onclick="filterEvents('Футбол', this, event)">Футбол</li>
+                <li onclick="filterEvents('Киберспорт', this, event)">Киберспорт</li>
+            </ul>
+            <div class="line-search">
+                <input type="search" id="line-search" placeholder="Команда или лига" oninput="applyLineFilters()">
+            </div>
+        </aside>
+
+        <section class="content-area">
+            <div id="tab-line" class="tab-view">
+                <!-- ИНФОРМАЦИОННЫЕ БЛОКИ -->
+                <div class="info-blocks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--turquoise); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28" style="color: var(--turquoise);"><path d="M9 11l3 3L22 4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <h3 style="color: var(--turquoise); font-size: 16px; margin: 0;">Топ события</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Самые популярные матчи сегодня</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--turquoise); font-weight: 800; font-size: 14px;" id="top-events-count">0 активных</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--accent); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28" style="color: var(--accent);"><path d="M2 7h20M2 12h20M2 17h20"/></svg>
+                            <h3 style="color: var(--accent); font-size: 16px; margin: 0;">Быстрые ставки</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Экспресс со средним кф. 2.5+</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--accent); font-weight: 800; font-size: 14px;">Средний кф: 2.43</div>
+                        </div>
+                    </div>
+
+                    <div class="info-block glass" style="padding: 24px; border-top: 3px solid var(--warning); cursor: pointer; transition: all 0.3s; overflow: hidden;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span style="font-size: 28px;">�</span>
+                            <h3 style="color: var(--warning); font-size: 16px; margin: 0;">Программа достижений</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Накопите очки и снимите уникальные призы без скрытых условий.</p>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: var(--warning); font-weight: 800; font-size: 14px;">Новые уровни каждую неделю</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- СТАТИСТИКА И РЕКОМЕНДАЦИИ -->
+                <div class="stats-section glass" style="padding: 28px; margin-bottom: 30px; border-left: 4px solid var(--turquoise);">
+                    <h3 style="color: var(--turquoise); font-size: 18px; margin-bottom: 20px; font-weight: 900; display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="9" width="7" height="12"/></svg> СТАТИСТИКА СЕГОДНЯ</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                        <div style="text-align: center; padding: 16px; background: rgba(0,242,255,0.05); border-radius: 12px; border: 1px solid rgba(0,242,255,0.1);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--turquoise); margin-bottom: 4px;" id="stats-matches">0</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Всего матчей</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: rgba(45,212,191,0.08); border-radius: 12px; border: 1px solid rgba(45,212,191,0.18);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--success); margin-bottom: 4px;" id="stats-sports">3</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Дисциплин</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: rgba(251,191,36,0.08); border-radius: 12px; border: 1px solid rgba(251,191,36,0.18);">
+                            <div style="font-size: 32px; font-weight: 900; color: var(--warning); margin-bottom: 4px;" id="stats-avg-odd">2.41</div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Средний КФ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ЛИНИЯ СОБЫТИЙ -->
+                <div id="lineFiltersMobile" class="filter-bar" style="display:none; overflow-x:auto; padding-bottom:10px; margin-bottom: 18px;">
+                    <button class="filter-pill active" onclick="filterEvents('Все', this, event)">Все события</button>
+                    <button class="filter-pill" onclick="filterEvents('Футбол', this, event)">Футбол</button>
+                    <button class="filter-pill" onclick="filterEvents('Киберспорт', this, event)">Киберспорт</button>
+                </div>
+                <h2 id="current-category" style="margin-bottom: 20px; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M4 6h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9 11l3 3L19 7" stroke="currentColor" stroke-width="2" fill="none"/></svg> Линия</h2>
+                <div id="eventsContainer"></div>
+            </div>
+
+            <div id="tab-history" class="tab-view">
+                <h2 style="margin-bottom: 5px; font-weight: 900;">МОИ СТАВКИ</h2>
+                <div id="historyContainer"></div>
+            </div>
+            <div id="tab-live" class="tab-view">
+                <h2 style="margin-bottom: 20px; font-weight: 900;">LIVE МАТЧИ</h2>
+                <div id="liveContainer"></div>
+            </div>
+            <div id="tab-promo" class="tab-view">
+                <h2 style="margin-bottom: 20px; font-weight: 900;">БОНУСЫ</h2>
+                <div style="display: grid; gap: 16px;">
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--success); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg></div>
+                        <h3 style="color: var(--success);">Приветственный бонус +100%</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">При первом пополнении баланс удваивается автоматически. Максимум 50,000 ₽</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Активировать бонус</button>
+                    </div>
+
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--warning); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M2 7h20M2 12h20M2 17h20"/></svg></div>
+                        <h3 style="color: var(--warning);">VIP-предложение</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Эксклюзивные условия и привилегии для постоянных игроков.</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Подробнее</button>
+                    </div>
+
+                    <div class="glass" style="padding: 30px; border-left: 4px solid var(--turquoise); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.1;"><svg viewBox="0 0 24 24" fill="currentColor" width="80" height="80" opacity="0.1"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/><circle cx="12" cy="12" r="2" fill="#fff"/></svg></div>
+                        <h3 style="color: var(--turquoise);">Программа лояльности</h3>
+                        <p style="color: var(--text-muted); margin-top: 10px;">Накапливайте очки за каждую ставку и обменивайте на бонусы</p>
+                        <button class="btn-submit-bet" style="margin-top: 12px; width: 100%;">Узнать больше</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside id="rightCoupon" class="coupon-area">
+            <div class="coupon-card glass" style="position: sticky; top: 20px;">
+                <div class="coupon-header">
+                    <span class="bet-type-badge" id="bet-type">Ординар</span>
+                    <span style="font-size: 14px; font-weight: 700;">КУПОН</span>
+                    <button class="drawer-close" onclick="toggleCouponDrawer(false)" title="Закрыть купон">×</button>
+                </div>
+                <div id="slip-items">
+                    <p style="text-align: center; color: var(--text-muted); padding: 20px;">Выберите исход</p>
+                </div>
+                <div id="slip-footer" style="display: none; margin-top: 20px;">
+                    <div id="conflict-warning" style="color: #fb7185; font-size: 11px; text-align: center; margin-bottom: 10px; font-weight: bold; display: none; background: rgba(251,113,133,0.12); padding: 10px; border-radius: 10px;">Несколько исходов одного рынка нельзя ставить вместе</div>
+                    <div class="coupon-summary">
+                        <input type="number" id="stakeAmount" placeholder="Сумма (₽)" oninput="updateWin()">
+                        <div class="stake-presets">
+                            <button type="button" onclick="setStakePreset(100)">100</button>
+                            <button type="button" onclick="setStakePreset(250)">250</button>
+                            <button type="button" onclick="setStakePreset(500)">500</button>
+                            <button type="button" onclick="setStakePreset(1000)">1000</button>
+                            <button type="button" onclick="setStakePreset('all')">All-in</button>
+                        </div>
+                        <div class="summary-row"><span>Общий Кф:</span><span id="summary-odd" style="color: var(--accent); font-weight: 800;">1.00</span></div>
+                        <div class="summary-row"><span>Выигрыш:</span><span id="winAmount" style="color: var(--success);">0 ₽</span></div>
+                    </div>
+                    <button class="btn-submit-bet" id="btn-place-bet" onclick="placeOrder()">Заключить пари</button>
+                    <button onclick="clearSlip()" style="background:none; border:none; color:var(--danger); width:100%; margin-top:10px; cursor:pointer; font-size:12px;">Очистить купон</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <div id="couponDrawerBackdrop" onclick="toggleCouponDrawer(false)"></div>
+
+    <div class="mobile-tabbar">
+        <button class="active" data-tab="home" onclick="switchMainTab('home')">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Главная</span>
+        </button>
+        <button data-tab="line" onclick="switchMainTab('line')">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">Линия</span>
+        </button>
+        <button id="historyMobileButton" data-tab="history" onclick="switchMainTab('history')" style="display:none">
+            <span class="tab-icon">🕘</span>
+            <span class="tab-label">История</span>
+        </button>
+        <button id="profileMobileButton" data-tab="profile" onclick="location.href='profile.html'" style="display:none">
+            <span class="tab-icon">👤</span>
+            <span class="tab-label">Профиль</span>
+        </button>
+        <button data-tab="coupon" onclick="toggleCouponDrawer(true)">
+            <span class="tab-icon">🎫</span>
+            <span class="tab-label">Купон</span>
+        </button>
+    </div>
+
+    <div id="lottieOverlay" class="lottie-overlay">
+        <div class="lottie-card">
+            <div id="lottiePlayer"></div>
+            <div class="lottie-text"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot, runTransaction 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
+            authDomain: "visbet-b4fa1.firebaseapp.com",
+            projectId: "visbet-b4fa1",
+            storageBucket: "visbet-b4fa1.firebasestorage.app",
+            messagingSenderId: "551263525115",
+            appId: "1:551263525115:web:05265f14a1f1e77d48f85e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.fb = { collection, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, onSnapshot, runTransaction };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js" integrity="sha512-8QL4X9jc5GYVhs5MfEUKEDKX1zj+/iYsV1s9uzFak2ujXQiLeOmH1AazHrJHTtDUSzlnSLmkdFQ7OGkJAFG/WA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        let allEvents = [];
+        let currentUser = null;
+        let currentSportFilter = 'Все';
+        let isPlacingBet = false;
+
+       /**
+ * Улучшенная система уведомлений VisBET
+ * Поддерживает заголовки, прогресс-бар и неоновые стили
+ */
+window.showToast = (message, type = 'info', title = '') => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // Настройки иконок и заголовков по умолчанию
+    const config = {
+        success: { icon: '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>', defaultTitle: 'Успешно' },
+        error: { icon: '⚠️', defaultTitle: 'Ошибка' },
+        info: { icon: 'ℹ️', defaultTitle: 'Инфо' }
+    };
+
+    const currentConfig = config[type] || config.info;
+
+    toast.innerHTML = `
+        <div class="toast-icon">${currentConfig.icon}</div>
+        <div class="toast-content">
+            <span class="toast-title">${title || currentConfig.defaultTitle}</span>
+            <span class="toast-msg">${message}</span>
+        </div>
+        <button class="toast-close" type="button">×</button>
+        <div class="toast-progress">
+            <div class="toast-progress-bar"></div>
+        </div>
+    `;
+
+    // Добавляем в контейнер
+    container.appendChild(toast);
+
+    // Функция для удаления уведомления с анимацией
+    const removeToast = () => {
+        if (toast.classList.contains('toast-out')) return; // Защита от повторного закрытия
+        toast.classList.add('toast-out');
+        setTimeout(() => toast.remove(), 420);
+    };
+
+    const closeBtn = toast.querySelector('.toast-close');
+    if (closeBtn) {
+        closeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeToast();
+        };
+    }
+
+    // Закрытие по клику на уведомление
+    toast.onclick = removeToast;
+
+    // Автоматическое удаление через 4 секунды
+    const timeoutId = setTimeout(removeToast, 4000);
+
+    toast.onmouseenter = () => clearTimeout(timeoutId);
+    toast.onmouseleave = () => setTimeout(removeToast, 1800);
+};
+
+        function formatMoney(num) {
+            return new Intl.NumberFormat('ru-RU').format(Math.round(num)) + " ₽";
+        }
+
+        function getTeamLogo(teamName) {
+            const letter = teamName ? teamName.trim().charAt(0) : '?';
+            return `<div class="team-logo">${letter}</div>`;
+        }
+
+        function escapeJsArg(value) {
+            return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
+        }
+
+        const getSlip = () => JSON.parse(localStorage.getItem('visbet_slip') || '[]');
+        const saveSlip = (data) => { 
+            localStorage.setItem('visbet_slip', JSON.stringify(data)); 
+            renderSlip(); 
+            updateSelectedOdds();
+        };
+
+        function hasSlipConflict(slip) {
+            const seen = {};
+            return slip.some(item => {
+                const key = `${item.id}::${item.market || 'market'}`;
+                const duplicate = Boolean(seen[key]);
+                seen[key] = true;
+                return duplicate;
+            });
+        }
+
+        function findFreshOddForSlipItem(freshEvent, item) {
+            if (!freshEvent || !Array.isArray(freshEvent.markets)) return null;
+            const market = freshEvent.markets.find(m => m.name === item.market) || freshEvent.markets[0];
+            if (!market || !Array.isArray(market.outcomes)) return null;
+            const outcome = market.outcomes.find(out => (out.name || out.label) === item.pick);
+            return outcome ? Number(outcome.odd) : null;
+        }
+
+        function getPendingBet(fingerprint) {
+            const raw = localStorage.getItem('visbet_pending_bet');
+            let pending = null;
+            try { pending = raw ? JSON.parse(raw) : null; } catch (e) { pending = null; }
+            if (!pending || pending.fingerprint !== fingerprint) {
+                pending = {
+                    fingerprint,
+                    id: String(Date.now()) + String(Math.floor(Math.random() * 900000 + 100000))
+                };
+                localStorage.setItem('visbet_pending_bet', JSON.stringify(pending));
+            }
+            return pending;
+        }
+
+        function setPlaceOrderBusy(isBusy) {
+            const btn = document.getElementById('btn-place-bet');
+            if (!btn) return;
+            btn.disabled = isBusy;
+            btn.style.opacity = isBusy ? '0.45' : '1';
+            btn.style.cursor = isBusy ? 'wait' : 'pointer';
+            btn.innerText = isBusy ? 'Отправляем...' : 'Заключить пари';
+        }
+
+        function escapeCssSelector(value) {
+            if (typeof CSS !== 'undefined' && CSS.escape) return CSS.escape(value);
+            return String(value).replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+        }
+
+        function updateSelectedOdds() {
+            const slip = getSlip();
+            const selectedKeys = new Set(slip.map(item => `${item.id}:::${item.market}:::${item.pick}`));
+            document.querySelectorAll('.odd-box').forEach(box => {
+                const id = box.dataset.eventId;
+                const pick = box.dataset.pick;
+                const market = box.dataset.market || 'Основной рынок';
+                const key = `${id}:::${market}:::${pick}`;
+                box.classList.toggle('selected', selectedKeys.has(key));
+            });
+        }
+
+        async function checkSession() {
+            const rawUser = localStorage.getItem('visbet_user')?.trim();
+            if (!rawUser) { renderAuthZone(null); return; }
+
+            // Ждём только если Firebase ещё не инициализирован
+            let attempts = 0;
+            while ((!window.fb || !window.fb.getDoc) && attempts < 20) {
+                await new Promise(r => setTimeout(r, 50));
+                attempts++;
+            }
+            
+            if (!window.fb || !window.fb.getDoc) {
+                console.warn('Firebase не инициализировался');
+                return;
+            }
+
+            try {
+                const docSnap = await window.fb.getDoc(window.fb.doc(window.db, "users", rawUser.trim()));
+                if (docSnap.exists()) {
+                    currentUser = docSnap.data();
+                    if (currentUser.isBanned) { document.getElementById('ban-screen').style.display = 'flex'; return; }
+                    renderAuthZone(currentUser);
+                } else {
+                    localStorage.removeItem('visbet_user');
+                    renderAuthZone(null);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderAuthZone(user) {
+            const authZone = document.getElementById('auth-zone');
+            const mobileTopBar = document.getElementById('mobileTopBar');
+            const mobileBalance = document.getElementById('mobileBalance');
+            const mobileUsername = document.getElementById('mobileUsername');
+            const adminBtn = document.getElementById('adminMainButton');
+            const profileBtn = document.getElementById('profileMainButton');
+            const historyBtn = document.getElementById('historyMainButton');
+            const profileMobileBtn = document.getElementById('profileMobileButton');
+            const historyMobileBtn = document.getElementById('historyMobileButton');
+            const setAuthVisibility = (visible) => {
+                [profileBtn, historyBtn, profileMobileBtn, historyMobileBtn].forEach(btn => {
+                    if (!btn) return;
+                    btn.style.display = visible ? '' : 'none';
+                });
+            };
+
+            if (!user) {
+                setAuthVisibility(false);
+                if (adminBtn) adminBtn.style.display = 'none';
+                if (mobileTopBar) mobileTopBar.style.display = 'none';
+                authZone.innerHTML = `<button class="btn-submit-bet auth-action" onclick="location.href='register.html'">Вход / Регистрация</button>`;
+                return;
+            }
+
+            setAuthVisibility(true);
+            if (adminBtn) adminBtn.style.display = (user.role === 'admin' || user.role === 'owner' || user.username === 'Admin') ? 'block' : 'none';
+            if (mobileTopBar) {
+                mobileTopBar.style.display = 'none';
+                const isMobile = window.matchMedia('(max-width: 760px)').matches;
+                if (isMobile) mobileTopBar.style.display = 'flex';
+            }
+            if (mobileBalance) mobileBalance.textContent = formatMoney(user.balance);
+            if (mobileUsername) mobileUsername.textContent = user.username;
+            authZone.innerHTML = `
+                <div class="balance">${formatMoney(user.balance)}</div>
+                <div class="username">${user.username}</div>
+                <button class="btn-logout" onclick="logout()">Выйти</button>
+            `;
+        }
+
+        window.logout = () => {
+            localStorage.removeItem('visbet_user');
+            location.reload();
+        };
+
+        async function loadHistory() {
+            if (!currentUser) return;
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = "<div class='skeleton skeleton-card'></div><div class='skeleton skeleton-card'></div>";
+            
+            try {
+                const q = window.fb.query(window.fb.collection(window.db, "bets"), window.fb.where("userId", "==", currentUser.username));
+                const snap = await window.fb.getDocs(q);
+                let bets = [];
+                snap.forEach(doc => bets.push(doc.data()));
+                bets.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                const activeBets = bets.filter(b => b.status === "В игре");
+                const resolvedBets = bets.filter(b => b.status !== "В игре");
+
+                let html = "";
+                html += `<div class="history-section-title">В игре (${activeBets.length})</div>`;
+                activeBets.forEach(bet => html += renderBetCard(bet));
+                html += `<div class="history-section-title" style="margin-top:40px;">Рассчитанные (${resolvedBets.length})</div>`;
+                resolvedBets.forEach(bet => html += renderBetCard(bet));
+                container.innerHTML = `<div class="history-grid">${html}</div>`;
+            } catch (e) { container.innerHTML = "Ошибка загрузки истории."; }
+        }
+
+        function renderBetCard(bet) {
+            const isWin = bet.status === 'Победа' || bet.status === 'Выигрыш';
+            const statusClass = isWin ? 'status-win' : (bet.status === 'Проигрыш' ? 'status-loss' : 'status-pending');
+            const totalWin = Math.round(bet.amount * bet.totalOdd);
+            return `
+                <div class="bet-card">
+                    <div class="bet-card-header">
+                        <div class="bet-card-meta">
+                            <span class="bet-card-date">${bet.date}</span>
+                            <span class="bet-event-name">Ставка #${bet.id || ''}</span>
+                        </div>
+                        <span class="bet-status-badge ${statusClass} bet-card-status">${bet.status}</span>
+                    </div>
+                    <div class="bet-card-items">
+                        ${bet.items.map(item => `
+                            <div class="bet-card-item">
+                                <span class="bet-event-name">${item.team}</span>
+                                <div class="bet-item-row">
+                                    <span class="bet-event-pick"><span class="bet-item-label">Выбор:</span> ${item.pick}</span>
+                                    <span class="bet-item-odd">кф. ${item.odd}</span>
+                                </div>
+                                ${item.market ? `<div class="bet-item-row"><span class="bet-item-label">Рынок:</span><span>${item.market}</span></div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="bet-footer">
+                        <div class="bet-summary">
+                            <span class="bet-sum-label">Сумма</span>
+                            <span class="bet-sum-val">${formatMoney(bet.amount)}</span>
+                        </div>
+                        <div class="bet-summary">
+                            <span class="bet-sum-label">Коэффициент</span>
+                            <span class="bet-sum-val" style="color:var(--turquoise)">${bet.totalOdd}</span>
+                        </div>
+                        <div class="potential-win">
+                            <span class="win-label">${isWin ? 'Выигрыш' : 'Возможный'}</span>
+                            <span class="win-val" style="color:${bet.status === 'Проигрыш' ? 'var(--danger)' : 'var(--success)'}">${formatMoney(totalWin)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.switchMainTab = (tab) => {
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.top-nav .nav-link, .mobile-tabbar button').forEach(v => v.classList.remove('active'));
+
+            const mainLayout = document.querySelector('.main-layout');
+            const leftSidebar = document.getElementById('leftSidebar');
+            const rightCoupon = document.getElementById('rightCoupon');
+            const lineFiltersMobile = document.getElementById('lineFiltersMobile');
+            const isMobile = window.matchMedia('(max-width: 760px)').matches;
+
+            if (tab === 'home') {
+                if (mainLayout) mainLayout.style.display = 'none';
+                if (leftSidebar) leftSidebar.classList.add('panel-hidden-keep-space');
+                if (rightCoupon) rightCoupon.classList.add('panel-hidden-keep-space');
+                if (lineFiltersMobile) lineFiltersMobile.style.display = 'none';
+                renderHomeEvents();
+            } else {
+                if (mainLayout) mainLayout.style.display = 'grid';
+                if (leftSidebar) leftSidebar.classList.remove('panel-hidden-keep-space');
+                if (rightCoupon) rightCoupon.classList.remove('panel-hidden-keep-space');
+            }
+
+            if (leftSidebar) {
+                if (tab === 'line') {
+                    leftSidebar.style.display = isMobile ? 'none' : '';
+                } else {
+                    leftSidebar.style.display = 'none';
+                }
+            }
+            if (lineFiltersMobile) {
+                lineFiltersMobile.style.display = isMobile && tab === 'line' ? 'flex' : 'none';
+            }
+
+            if (mainLayout) {
+                if (isMobile) {
+                    mainLayout.style.gridTemplateColumns = '';
+                } else if (tab === 'line') {
+                    mainLayout.style.gridTemplateColumns = '260px 1fr 340px';
+                } else {
+                    mainLayout.style.gridTemplateColumns = '1fr 340px';
+                }
+            }
+
+            const targetTab = document.getElementById('tab-' + tab) || document.getElementById('tab-line');
+            if (targetTab) targetTab.classList.add('active');
+
+            const activeNav = document.querySelector(`.top-nav .nav-link[data-tab="${tab}"]`);
+            if (activeNav) activeNav.classList.add('active');
+
+            const mobileNav = document.querySelector(`.mobile-tabbar button[data-tab="${tab}"]`);
+            if (mobileNav) mobileNav.classList.add('active');
+
+            if (tab === 'history') loadHistory();
+            if (tab === 'live') renderLiveEvents();
+            if (tab === 'line') applyLineFilters();
+        };
+
+        function findMarket(ev, patterns) {
+            if (!Array.isArray(ev.markets)) return null;
+            const regexes = patterns.map(p => new RegExp(p, 'i'));
+            return ev.markets.find(m => regexes.some(re => re.test(m.name || '')));
+        }
+
+        function renderOddsRow(ev, market, labelOverride) {
+            const outcomes = market?.outcomes || [];
+            const marketName = market?.name || 'Основной рынок';
+            const label = labelOverride || marketName;
+            return `
+                <div class="market-block">
+                    <div class="market-title">${label}</div>
+                    <div class="odds-row" style="display:flex; gap:8px; overflow-x: auto; -webkit-overflow-scrolling: touch;" onclick="event.stopPropagation()">
+                        ${outcomes.slice(0, 3).map(out => {
+                            const outcomeLabel = out.name || out.label || 'Исход';
+                            return `
+                                <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(marketName)}" data-pick="${outcomeLabel}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(`${ev.teams.home} — ${ev.teams.away}`)}', '${escapeJsArg(outcomeLabel)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')" style="min-width: 90px;">
+                                    <span class="label">${outcomeLabel}</span><span class="val">${out.odd}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHomeEvents() {
+            const container = document.getElementById('homeEventsContainer');
+            if (!container) return;
+            
+            const topEvents = allEvents.filter(ev => ev.status !== 'Закрыт').slice(0, 3);
+            
+            if (topEvents.length === 0) {
+                container.innerHTML = "<p style='opacity:0.5; text-align: center; padding: 20px;'>Нет активных событий</p>";
+                return;
+            }
+            
+            container.innerHTML = topEvents.map(ev => {
+                const teamName = `${ev.teams.home} — ${ev.teams.away}`;
+                const liveBadge = ev.isLive ? '<span class="badge-live">LIVE</span>' : '';
+                const mainMarket = findMarket(ev, ['1x2','п1.*x.*п2','п1.*х.*п2','исход','результат','match result']) || ev.markets?.[0];
+                const bttsMarket = findMarket(ev, ['обе забьют','both teams','btts']);
+                const dcMarket = findMarket(ev, ['двойной шанс','double chance']);
+                return `
+                    <div class="match-card home-event-card glass animation-fade" onclick="openMatch('${escapeJsArg(ev.id)}')">
+                        <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span>${ev.league} | ${ev.date}</span>
+                            <div style="display:flex; gap:6px; align-items:center;">${liveBadge}<span style="background:rgba(0,242,255,0.1); padding:3px 6px; border-radius:4px; color:var(--turquoise); font-size:10px;">${ev.sport}</span></div>
+                        </div>
+                        <div class="match-teams-row" style="margin-bottom:10px;">
+                            ${getTeamLogo(ev.teams.home)}
+                            <div style="font-size:16px; font-weight:bold; flex:1; text-align:center;">${teamName}</div>
+                            ${getTeamLogo(ev.teams.away)}
+                        </div>
+                        ${renderOddsRow(ev, mainMarket, 'П1 × Х × П2')}
+                        ${bttsMarket ? renderOddsRow(ev, bttsMarket, 'Обе забьют') : ''}
+                        ${dcMarket ? renderOddsRow(ev, dcMarket, 'Двойной шанс') : ''}
+                    </div>
+                `;
+            }).join('');
+            updateSelectedOdds();
+        }
+
+        window.toggleCouponDrawer = (show) => {
+            const drawer = document.getElementById('rightCoupon');
+            const backdrop = document.getElementById('couponDrawerBackdrop');
+            if (!drawer || !backdrop) return;
+            const isMobile = window.matchMedia('(max-width: 760px)').matches;
+            if (show) {
+                if (isMobile) {
+                    drawer.classList.add('drawer-open');
+                    backdrop.classList.add('visible');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    drawer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            } else {
+                drawer.classList.remove('drawer-open');
+                backdrop.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+        };
+
+        window.setStakePreset = (value) => {
+            const input = document.getElementById('stakeAmount');
+            if (!input) return;
+            if (value === 'all') {
+                const balanceSpan = document.getElementById('display-balance');
+                const available = balanceSpan ? Number(String(balanceSpan.innerText).replace(/[^0-9]/g, '')) : 0;
+                input.value = available || 100;
+            } else {
+                input.value = value;
+            }
+            updateWin();
+            if ('vibrate' in navigator) navigator.vibrate(25);
+        };
+
+        window.showLottieSuccess = () => {
+            const overlay = document.getElementById('lottieOverlay');
+            if (!overlay) return;
+            overlay.classList.add('visible');
+            if (window.lottie && document.getElementById('lottiePlayer')) {
+                window.lottie.loadAnimation({
+                    container: document.getElementById('lottiePlayer'),
+                    renderer: 'svg',
+                    loop: false,
+                    autoplay: true,
+                    path: 'https://assets10.lottiefiles.com/packages/lf20_jbrw3hcz.json'
+                });
+            }
+            setTimeout(() => overlay.classList.remove('visible'), 2200);
+        };
+
+        window.applyLineFilters = () => {
+            const search = (document.getElementById('line-search')?.value || '').trim().toLowerCase();
+            let filtered = currentSportFilter === 'Все'
+                ? allEvents.filter(ev => ev.status !== 'Закрыт')
+                : allEvents.filter(ev => ev.sport === currentSportFilter && ev.status !== 'Закрыт');
+
+            if (search) {
+                filtered = filtered.filter(ev => {
+                    const fields = [
+                        ev.sport,
+                        ev.league,
+                        ev.teams?.home,
+                        ev.teams?.away
+                    ].filter(Boolean).join(' ').toLowerCase();
+                    return fields.includes(search);
+                });
+            }
+
+            renderLine(filtered);
+        };
+
+        window.filterEvents = (sport, el = null, evt = null) => {
+            currentSportFilter = sport;
+            document.querySelectorAll('#sportFilter li').forEach(li => li.classList.remove('active'));
+            const target = el || evt?.target;
+            if (target) target.classList.add('active');
+            document.getElementById('current-category').innerText = sport;
+            applyLineFilters();
+        };
+
+        function getEventStartDate(ev) {
+            const dateString = ev.date || '';
+            const timeString = ev.time || '';
+            if (!dateString) return null;
+            let datePart = dateString.trim();
+            if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(datePart)) {
+                const [day, month, year] = datePart.split('.').map(Number);
+                return new Date(year, month - 1, day, ...timeString.split(':').map(Number));
+            }
+            const parsed = new Date(`${datePart} ${timeString}`);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function refreshLiveStatus() {
+            const now = Date.now();
+            allEvents.forEach(ev => {
+                const start = getEventStartDate(ev);
+                ev.isLive = false;
+                ev.liveStartsIn = null;
+                if (start) {
+                    const diff = start.getTime() - now;
+                    ev.liveStartsIn = Math.max(0, Math.ceil(diff / 60000));
+                    if (diff <= 5 * 60000 && diff > -120 * 60000) {
+                        ev.isLive = true;
+                    }
+                }
+            });
+            renderLiveEvents();
+        }
+
+        function renderLiveEvents() {
+            const container = document.getElementById('liveContainer');
+            if (!container) return;
+            const liveMatches = allEvents.filter(ev => ev.isLive && ev.status !== 'Закрыт');
+            if (!liveMatches.length) {
+                container.innerHTML = '<p style="opacity:0.6;">Сейчас нет live-матчей. Скоро появятся события, оставшиеся до старта менее 5 минут.</p>';
+                return;
+            }
+            container.innerHTML = liveMatches.map(ev => {
+                const market = ev.markets?.[0] || { outcomes: [] };
+                const badge = `<span class="badge-live">LIVE</span>`;
+                const countdown = ev.liveStartsIn > 0 ? `<span style="opacity:.7;">Начнётся через ${ev.liveStartsIn} мин.</span>` : `<span style="opacity:.7;">В эфире</span>`;
+                return `
+                    <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${escapeJsArg(ev.id)}')">
+                        <div class="match-header" style="font-size:11px; opacity:0.7; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <span>${ev.league} | ${ev.date} ${ev.time}</span>
+                            <div style="display:flex; gap:8px; align-items:center;">${badge}${countdown}</div>
+                        </div>
+                        <div class="match-teams-row">
+                            ${getTeamLogo(ev.teams.home)}
+                            <div style="font-size:18px; font-weight:bold; flex:1;">${ev.teams.home} — ${ev.teams.away}</div>
+                            ${getTeamLogo(ev.teams.away)}
+                        </div>
+                        <div class="odds-row" style="display:flex; gap:10px;" onclick="event.stopPropagation()">
+                            ${market.outcomes.map(out => {
+                                const label = out.name || out.label || 'Исход';
+                                return `
+                                    <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(market.name || 'Основной рынок')}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(ev.teams.home + ' — ' + ev.teams.away)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(market.name || 'Основной рынок')}')">
+                                        <span class="label">${label}</span><span class="val">${out.odd}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- LIVE РЕЖИМ: ЗАГРУЗКА СОБЫТИЙ ЧЕРЕЗ ONSNAPSHOT ---
+        async function loadEvents() {
+            const container = document.getElementById('eventsContainer');
+            // Показываем скелетоны только при самой первой загрузке
+            container.innerHTML = `<div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>`;
+
+            // Ждём инициализации Firebase (максимум 1 секунда)
+            let attempts = 0;
+            while ((!window.fb || !window.fb.onSnapshot) && attempts < 20) {
+                await new Promise(r => setTimeout(r, 50));
+                attempts++;
+            }
+            
+            if (!window.fb || !window.fb.onSnapshot) {
+                console.warn('Firebase не инициализировался');
+                container.innerHTML = "<p>Ошибка доступа к данным</p>";
+                return;
+            }
+            
+            const q = window.fb.collection(window.db, "events");
+
+            // Подписываемся на обновления
+            window.fb.onSnapshot(q, (snapshot) => {
+                allEvents = [];
+                snapshot.forEach(doc => allEvents.push({id: doc.id, ...doc.data()}));
+                
+                refreshLiveStatus();
+                applyLineFilters();
+                renderHomeEvents();
+                renderLiveEvents();
+                updateStatsDisplay();
+                syncSlipOdds();
+            }, (error) => {
+                console.error("Snapshot error:", error);
+                container.innerHTML = "<p>Ошибка доступа к данным</p>";
+            });
+
+            setInterval(refreshLiveStatus, 30000);
+        }
+
+        // --- СИНХРОНИЗАЦИЯ КУПОНА ПРИ ИЗМЕНЕНИИ КФ ---
+        function syncSlipOdds() {
+            let slip = getSlip();
+            let changed = false;
+            const changedItems = [];
+
+            slip = slip.map(item => {
+                const freshEvent = allEvents.find(e => e.id === item.id);
+                const freshOdd = findFreshOddForSlipItem(freshEvent, item);
+                if (freshOdd && freshOdd !== item.odd) {
+                    item.previousOdd = item.odd;
+                    item.odd = freshOdd;
+                    item.oddChangedAt = Date.now();
+                    changedItems.push(`${item.pick}: было ${item.previousOdd}, стало ${item.odd}`);
+                    changed = true;
+                }
+                return item;
+            });
+
+            if (changed) {
+                localStorage.setItem('visbet_slip', JSON.stringify(slip));
+                renderSlip();
+                showToast(`Коэффициент изменился: ${changedItems[0]}`, "info");
+            }
+        }
+
+        function renderLine(events) {
+            const container = document.getElementById('eventsContainer');
+            if (events.length === 0) { container.innerHTML = "<p style='opacity:0.5'>Событий нет</p>"; return; }
+            container.innerHTML = events.map(ev => {
+                const market = ev.markets?.[0];
+                const outcomes = market?.outcomes || [];
+                const marketName = market?.name || 'Основной рынок';
+                const teamName = `${ev.teams.home} — ${ev.teams.away}`;
+                const liveBadge = ev.isLive ? '<span class="badge-live">LIVE</span>' : '';
+                const countdown = ev.liveStartsIn !== null && !ev.isLive
+                    ? `<span style="opacity:.6; font-size:12px;">Начнётся через ${ev.liveStartsIn} мин.</span>`
+                    : '';
+                return `
+                <div class="match-card glass animation-fade" style="margin-bottom:15px; padding:20px; cursor:pointer;" onclick="openMatch('${escapeJsArg(ev.id)}')">
+                    <div class="match-header" style="font-size:11px; opacity:0.6; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <span>${ev.league} | ${ev.date} ${ev.time}</span>
+                        <div style="display:flex; gap:8px; align-items:center;">${liveBadge}<span style="background:rgba(0,242,255,0.1); padding:4px 8px; border-radius:5px; color:var(--turquoise)">${ev.sport}</span></div>
+                    </div>
+                    ${countdown ? `<div style="margin-top:8px; color: var(--text-muted);">${countdown}</div>` : ''}
+                    <div class="match-teams-row">
+                        ${getTeamLogo(ev.teams.home)}
+                        <div style="font-size:18px; font-weight:bold; flex:1;">${teamName}</div>
+                        ${getTeamLogo(ev.teams.away)}
+                    </div>
+                    <div class="odds-row" style="display:flex; gap:10px;" onclick="event.stopPropagation()">
+                        ${outcomes.map(out => {
+                            const label = out.name || out.label || 'Исход';
+                            return `
+                                <div class="odd-box" data-event-id="${ev.id}" data-market="${escapeJsArg(marketName)}" data-pick="${label}" onclick="addToSlip('${escapeJsArg(ev.id)}', '${escapeJsArg(teamName)}', '${escapeJsArg(label)}', ${Number(out.odd) || 1}, '${escapeJsArg(marketName)}')">
+                                    <span class="label">${label}</span><span class="val">${out.odd}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            }).join('');
+            updateSelectedOdds();
+        }
+
+        window.openMatch = (id) => { location.href = `event.html?id=${id}`; };
+
+        window.addToSlip = (id, team, pick, odd, market) => {
+            let slip = getSlip();
+            const existingIndex = slip.findIndex(i => i.id === id && i.pick === pick && i.market === market);
+            if (existingIndex !== -1) {
+                slip.splice(existingIndex, 1);
+                showToast("Событие удалено из купона", "info");
+            } else {
+                slip = slip.filter(i => !(i.id === id && i.market === market));
+                slip.push({id, team, pick, odd, market, addedAt: Date.now()});
+                showToast("Событие добавлено!", "success");
+            }
+            saveSlip(slip);
+        };
+
+        function renderSlip() {
+            const slip = getSlip();
+            const container = document.getElementById('slip-items');
+            const footer = document.getElementById('slip-footer');
+            const warn = document.getElementById('conflict-warning');
+            const btn = document.getElementById('btn-place-bet');
+
+            if(slip.length === 0) {
+                container.innerHTML = `<p style="text-align:center; padding:20px; color:gray;">Выберите исход</p>`;
+                footer.style.display = 'none';
+                updateSelectedOdds();
+                return;
+            }
+
+            const hasConflict = hasSlipConflict(slip);
+
+            if(warn) warn.style.display = hasConflict ? 'block' : 'none';
+            if(btn) {
+                btn.disabled = hasConflict;
+                btn.style.opacity = hasConflict ? '0.3' : '1';
+                btn.style.cursor = hasConflict ? 'not-allowed' : 'pointer';
+            }
+
+            container.innerHTML = slip.map((item, idx) => `
+                <div class="coupon-item" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; margin-bottom:5px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div class="ci-top" style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px;">
+                        <span>${item.team}</span>
+                        <button onclick="removeFromSlip(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;">×</button>
+                    </div>
+                    <div class="ci-bottom" style="display:flex; justify-content:space-between; margin-top:5px;">
+                        <span style="font-size:11px; opacity:0.7;">${item.pick}</span>
+                        <span style="color:var(--turquoise); font-weight:bold;">${item.odd}</span>
+                    </div>
+                    ${item.previousOdd && item.previousOdd !== item.odd ? `<div class="odds-change">было ${item.previousOdd}, стало ${item.odd}</div>` : ''}
+                </div>
+            `).join('');
+            footer.style.display = 'block';
+            const totalOdd = slip.reduce((sum, item) => sum * item.odd, 1).toFixed(2);
+            document.getElementById('summary-odd').innerText = totalOdd;
+            document.getElementById('bet-type').innerText = slip.length > 1 ? "Экспресс" : "Ординар";
+            updateWin();
+            updateSelectedOdds();
+        }
+
+        window.updateWin = () => {
+            const amt = document.getElementById('stakeAmount').value || 0;
+            const odd = parseFloat(document.getElementById('summary-odd').innerText);
+            document.getElementById('winAmount').innerText = formatMoney(amt * odd);
+        };
+
+        window.removeFromSlip = (idx) => { 
+            let s = getSlip(); 
+            s.splice(idx, 1); 
+            saveSlip(s); 
+            showToast("Событие удалено", "info");
+        };
+
+        window.clearSlip = () => { saveSlip([]); showToast("Купон очищен", "info"); };
+
+        window.placeOrder = async () => {
+            if (isPlacingBet) {
+                showToast("Ставка уже отправляется", "info");
+                return;
+            }
+            if(!currentUser) { showToast("Войдите в аккаунт!", "error"); return; }
+            const slip = getSlip();
+            const amount = Math.round(parseFloat(document.getElementById('stakeAmount').value));
+            if(!amount || amount < 10) { showToast("Минимум 10 ₽", "error"); return; }
+            if(amount > currentUser.balance) { showToast("Недостаточно средств!", "error"); return; }
+            if(slip.length === 0) { showToast("Купон пуст", "error"); return; }
+            if(hasSlipConflict(slip)) { showToast("Нельзя выбрать несколько исходов одного рынка", "error"); return; }
+
+            const betData = {
+                userId: currentUser.username,
+                amount: amount,
+                totalOdd: parseFloat(document.getElementById('summary-odd').innerText),
+                items: slip,
+                status: "В игре",
+                date: new Date().toLocaleString(),
+                timestamp: Date.now()
+            };
+            const fingerprint = JSON.stringify({
+                userId: currentUser.username,
+                amount,
+                totalOdd: betData.totalOdd,
+                items: slip.map(item => ({
+                    id: item.id,
+                    market: item.market,
+                    pick: item.pick,
+                    odd: item.odd
+                }))
+            });
+            const pendingBet = getPendingBet(fingerprint);
+            let createdNewBet = false;
+
+            try {
+                isPlacingBet = true;
+                setPlaceOrderBusy(true);
+
+                await window.fb.runTransaction(window.db, async (transaction) => {
+                    const betRef = window.fb.doc(window.db, "bets", pendingBet.id);
+                    const userRef = window.fb.doc(window.db, "users", currentUser.username);
+                    const existingBet = await transaction.get(betRef);
+                    if (existingBet.exists()) return;
+                    createdNewBet = true;
+
+                    const userSnap = await transaction.get(userRef);
+                    if (!userSnap.exists()) throw new Error("Пользователь не найден");
+                    const freshUser = userSnap.data();
+                    if (Math.round(freshUser.balance || 0) < amount) throw new Error("Недостаточно средств");
+
+                    transaction.set(betRef, {
+                        ...betData,
+                        requestKey: fingerprint,
+                        idempotencyKey: pendingBet.id
+                    });
+                    transaction.update(userRef, {
+                        balance: Math.round((freshUser.balance || 0) - amount)
+                    });
+                });
+
+                if (createdNewBet) {
+                    await window.fb.setDoc(window.fb.doc(window.db, "balance_history", `bh_${pendingBet.id}`), {
+                        userId: currentUser.username,
+                        type: "Ставка",
+                        label: `Списано за пари ${pendingBet.id.slice(-6)}`,
+                        amount: -amount,
+                        betId: pendingBet.id,
+                        createdAt: new Date().toLocaleString(),
+                        timestamp: Date.now()
+                    });
+                }
+
+                saveSlip([]);
+                localStorage.removeItem('visbet_pending_bet');
+                showToast("Ставка принята! Удачи!", "success");
+                if ('vibrate' in navigator) navigator.vibrate(50);
+                showLottieSuccess();
+                toggleCouponDrawer(false);
+                // Обновляем данные пользователя без перезагрузки
+                setTimeout(() => checkSession(), 500); 
+            } catch (e) {
+                showToast(e.message || "Ошибка оформления ставки", "error");
+            } finally {
+                isPlacingBet = false;
+                setPlaceOrderBusy(false);
+            }
+        };
+
+        window.addEventListener('storage', (e) => { if(e.key === 'visbet_slip') renderSlip(); });
+
+        // Функция обновления статистики на главной
+        function updateStatsDisplay() {
+            const activeEvents = allEvents.filter(e => e.status !== 'Закрыт');
+            const matchCount = activeEvents.length;
+            const liveCount = allEvents.filter(e => e.isLive && e.status !== 'Закрыт').length;
+            const avgOdd = activeEvents.reduce((sum, e) => {
+                const outcomes = e.markets?.[0]?.outcomes || [];
+                return sum + (outcomes.length ? outcomes.reduce((s, o) => s + Number(o.odd), 0) / outcomes.length : 0);
+            }, 0) / (activeEvents.length || 1);
+            const betCount = getSlip().length;
+
+            document.getElementById('stats-matches').textContent = matchCount;
+            document.getElementById('top-events-count').textContent = matchCount + ' активных';
+            document.getElementById('stats-avg-odd').textContent = avgOdd.toFixed(2);
+            const heroEvents = document.getElementById('hero-events-count');
+            const heroLive = document.getElementById('hero-live-count');
+            const heroBets = document.getElementById('hero-bets-count');
+            if (heroEvents) heroEvents.textContent = matchCount;
+            if (heroLive) heroLive.textContent = liveCount;
+            if (heroBets) heroBets.textContent = betCount;
+        }
+
+        // Обновляем статистику при загрузке событий (убрали ненужный setInterval)
+        // Статистика теперь обновляется автоматически через onSnapshot в loadEvents()
+
+        function getInitialTab() {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            const valid = ['home', 'line', 'history', 'live', 'promo'];
+            return valid.includes(tab) ? tab : 'home';
+        }
+
+        // === ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ (ПАРАЛЛЕЛЬНАЯ ЗАГРУЗКА) ===
+        const initApp = async () => {
+            try {
+                // Загружаем данные параллельно, не ждя друг друга
+                await Promise.all([
+                    checkSession(),
+                    loadEvents()
+                ]);
+                renderSlip();
+                updateStatsDisplay();
+                switchMainTab(getInitialTab());
+            } catch (e) {
+                console.error('Ошибка инициализации:', e);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+ 
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisBET Регистрация">
+    <meta name="theme-color" content="#0b0e11">
+    <title>VisBET | Вход и Регистрация</title>
+    <style>
+        :root { 
+            --turquoise: #38BDF8;
+            --turquoise-hover: #7DD3FC;
+            --turquoise-glow: rgba(56, 189, 248, 0.25);
+            --turquoise-alpha: rgba(56, 189, 248, 0.12);
+            --bg-black: #0B1628;
+            --dark-card: #111A2F;
+            --panel: rgba(255, 255, 255, 0.05);
+            --panel-strong: rgba(255, 255, 255, 0.12);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-muted: #94A3B8;
+            --text-soft: #E2E8F0;
+            --danger: #FB7185;
+            --success: #2DD4BF;
+            --shadow-premium: 0 20px 55px rgba(0, 0, 0, 0.42);
+            --shadow-line: 0 0 0 1px rgba(255,255,255,0.08), 0 22px 48px rgba(0,0,0,0.32);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            background: var(--bg-black);
+            background:
+                radial-gradient(circle at 20% 10%, rgba(56,189,248,0.16) 0%, transparent 28%),
+                radial-gradient(circle at 80% 15%, rgba(45,212,191,0.10) 0%, transparent 24%),
+                linear-gradient(180deg, #07111E 0%, #0B1628 45%, #081623 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            filter: blur(120px);
+            z-index: 0;
+        }
+
+        .glow-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--turquoise) 0%, transparent 70%);
+            top: -10%;
+            right: -10%;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 88, 84, 0.8) 0%, transparent 70%);
+            bottom: -5%;
+            left: -5%;
+            animation: float 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+            align-items: center;
+        }
+
+        /* Left side - Branding */
+        .auth-branding {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            text-shadow: 0 0 20px var(--turquoise-glow);
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo-text span {
+            color: var(--turquoise);
+            text-shadow: 0 0 15px var(--turquoise-glow);
+        }
+
+        .brand-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            max-width: 350px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-soft);
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--turquoise-alpha);
+            border: 1px solid var(--turquoise);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--turquoise);
+            flex-shrink: 0;
+        }
+
+        /* Right side - Form */
+        .auth-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025));
+            backdrop-filter: blur(20px) saturate(130%);
+            -webkit-backdrop-filter: blur(20px) saturate(130%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: var(--shadow-line);
+            width: 100%;
+            max-width: 420px;
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .field {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--turquoise);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 12px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        input:focus {
+            border-color: var(--turquoise);
+            background: rgba(56,189,248,0.08);
+            box-shadow: 0 0 18px rgba(56,189,248,0.24);
+        }
+
+        input:hover {
+            border-color: rgba(56,189,248,0.4);
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--turquoise) 0%, var(--turquoise-hover) 100%);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-auth::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            pointer-events: none;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 34px rgba(56, 189, 248, 0.25);
+        }
+
+        .btn-auth:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-auth:active {
+            transform: translateY(0);
+        }
+
+        .auth-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(56,189,248,0.18), transparent 60%);
+            pointer-events: none;
+        }
+
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -20px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(45,212,191,0.12), transparent 60%);
+            pointer-events: none;
+        }
+
+        .field input {
+            border-radius: 16px;
+            font-size: 15px;
+            min-height: 52px;
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.18);
+        }
+
+        .field label {
+            letter-spacing: 0.9px;
+            margin-bottom: 12px;
+        }
+
+        .form-header {
+            margin-bottom: 36px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .form-header .form-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 360px;
+        }
+
+        .feature-list {
+            gap: 18px;
+        }
+
+        .feature-item {
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+        }
+
+        .toggle-section {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .toggle-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .toggle-link:hover {
+            color: var(--text-soft);
+        }
+
+        .toggle-link span {
+            color: var(--turquoise);
+            font-weight: 600;
+            text-decoration: underline;
+            text-decoration-color: transparent;
+            transition: text-decoration-color 0.3s;
+        }
+
+        .toggle-link:hover span {
+            text-decoration-color: var(--turquoise);
+        }
+
+        /* Ban overlay */
+        #ban-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(30, 10, 10, 0.9));
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .ban-icon {
+            font-size: 100px;
+            color: var(--danger);
+            margin-bottom: 30px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #ban-overlay h1 {
+            font-size: 32px;
+            color: var(--danger);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        #ban-overlay p {
+            font-size: 14px;
+            color: var(--text-soft);
+            max-width: 400px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                padding: 24px;
+                gap: 30px;
+            }
+
+            .auth-branding {
+                display: none;
+            }
+
+            .auth-card {
+                max-width: 100%;
+                padding: 32px;
+            }
+
+            .bg-glow {
+                filter: blur(60px);
+                opacity: 0.08;
+            }
+
+            .glow-1 {
+                width: 300px;
+                height: 300px;
+            }
+
+            .glow-2 {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <div id="ban-overlay">
+        <div class="ban-icon">⛔</div>
+        <h1>ВАШ АККАУНТ ЗАБЛОКИРОВАН</h1>
+        <p>Вы нарушили правила пользования платформой VisBET.<br>Доступ к функциям ставок ограничен.</p>
+        <button onclick="clearBannedSession()" class="btn-auth" style="width: auto; padding: 12px 40px; background: linear-gradient(135deg, var(--danger) 0%, #e63a3a 100%); max-width: fit-content;">Войти другим аккаунтом</button>
+    </div>
+
+    <div class="auth-container" id="auth-form">
+        <!-- Left side - Branding -->
+        <div class="auth-branding">
+            <div class="logo-section">
+                <div class="logo-icon"></div>
+                <div>
+                    <div class="logo-text">Vis<span>BET</span></div>
+                </div>
+            </div>
+
+            <div class="brand-description">
+                VisBET — это современный портал для ставок, где интерфейс построен под скорость, безопасность и интеллектуальную аналитику.
+            </div>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <span>Молниеносный вход и простой купон</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <span>Надёжная защита данных и платежей</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎁</div>
+                    <span>Стартовый бонус 1000 ₽ на первый депозит</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⭐</div>
+                    <span>Персональные рекомендации и VIP-статус</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right side - Form -->
+        <div class="auth-card">
+            <div class="form-header">
+                <h2 id="form-title">Регистрация</h2>
+                <div class="form-subtitle" id="form-subtitle">Создайте аккаунт для начала игры</div>
+            </div>
+
+            <div class="field">
+                <label>Имя пользователя</label>
+                <input type="text" id="username" placeholder="Ivanov777">
+            </div>
+
+            <div class="field">
+                <label>Пароль</label>
+                <input type="password" id="password" placeholder="Минимум 6 символов">
+            </div>
+
+            <button class="btn-auth" id="main-btn" onclick="handleAuth()">СОЗДАТЬ АККАУНТ</button>
+
+            <div class="toggle-section">
+                <div class="toggle-link" onclick="toggleMode()">
+                    <span id="toggle-text">Уже есть аккаунт? <span>Войти</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
+            authDomain: "visbet-b4fa1.firebaseapp.com",
+            projectId: "visbet-b4fa1",
+            storageBucket: "visbet-b4fa1.firebasestorage.app",
+            messagingSenderId: "551263525115",
+            appId: "1:551263525115:web:05265f14a1f1e77d48f85e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let isLoginMode = false;
+
+        window.toggleMode = () => {
+            isLoginMode = !isLoginMode;
+            const titleEl = document.getElementById('form-title');
+            const subtitleEl = document.getElementById('form-subtitle');
+            const btnEl = document.getElementById('main-btn');
+            const toggleEl = document.getElementById('toggle-text');
+            
+            if (isLoginMode) {
+                titleEl.innerText = "Вход";
+                subtitleEl.innerText = "Введите данные для входа в аккаунт";
+                btnEl.innerText = "ВОЙТИ";
+                toggleEl.innerHTML = "Нет аккаунта?<p><span>Зарегистрироваться</span></p>";
+            } else {
+                titleEl.innerText = "Регистрация";
+                subtitleEl.innerText = "Создайте аккаунт для начала игры";
+                btnEl.innerText = "СОЗДАТЬ АККАУНТ";
+                toggleEl.innerHTML = "Уже есть аккаунт?<p><span>Войти</span></p>";
+            }
+            
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        };
+
+        window.handleAuth = async () => {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            if (!user || !pass) {
+                alert("Заполните все поля!");
+                return;
+            }
+
+            if (!isLoginMode && pass.length < 6) {
+                alert("Пароль должен содержать минимум 6 символов!");
+                return;
+            }
+
+            const userRef = doc(db, "users", user);
+
+            try {
+                const snap = await getDoc(userRef);
+
+                if (isLoginMode) {
+                    // --- ЛОГИКА ВХОДА ---
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        
+                        if (data.isBanned) {
+                            localStorage.removeItem('visbet_user');
+                            showBanScreen();
+                            return;
+                        }
+
+                        if (data.password === pass) {
+                            localStorage.setItem('visbet_user', user);
+                            location.href = 'index.html';
+                        } else {
+                            alert("Неверный пароль!");
+                        }
+                    } else {
+                        alert("Пользователь не найден!");
+                    }
+                } else {
+                    // --- ЛОГИКА РЕГИСТРАЦИИ ---
+                    if (snap.exists()) {
+                        alert("Это имя уже занято!");
+                    } else {
+                        await setDoc(userRef, {
+                            username: user,
+                            password: pass,
+                            balance: 1000,
+                            isBanned: false,
+                            regDate: new Date().toISOString()
+                        });
+                        localStorage.setItem('visbet_user', user);
+                        alert("Регистрация успешна! Добро пожаловать в VisBET!");
+                        location.href = 'index.html';
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка доступа к базе данных.");
+            }
+        };
+
+        function showBanScreen() {
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('ban-overlay').style.display = 'flex';
+        }
+
+        function clearBannedSession() {
+            localStorage.removeItem('visbet_user');
+            document.getElementById('ban-overlay').style.display = 'none';
+            document.getElementById('auth-form').style.display = 'grid';
+        }
+
+        async function checkCurrentSession() {
+            const savedUser = localStorage.getItem('visbet_user');
+            if (savedUser) {
+                try {
+                    const snap = await getDoc(doc(db, "users", savedUser));
+                    if (snap.exists() && snap.data().isBanned) {
+                        showBanScreen();
+                    }
+                } catch (e) {
+                    console.warn("Session check failed:", e);
+                }
+            }
+        }
+        
+        checkCurrentSession();
+
+        // Удалить формочку если пользователь уже залогинен и не забанен
+        const savedUser = localStorage.getItem('visbet_user')?.trim();
+        if (savedUser) {
+            getDoc(doc(db, "users", savedUser)).then(snap => {
+                if (snap.exists() && !snap.data().isBanned) {
+                    location.href = 'index.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
