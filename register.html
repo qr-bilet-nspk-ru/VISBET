@@ -2,551 +2,1210 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0, user-scalable=yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="VisBET Регистрация">
-    <meta name="theme-color" content="#0b0e11">
-    <title>VisBET | Вход и Регистрация</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#030712">
+    <meta name="description" content="VisBET - авторизация">
+    <title>VISBET | Вход в аккаунт</title>
     <style>
-        :root { 
-            --turquoise: #38BDF8;
-            --turquoise-hover: #7DD3FC;
-            --turquoise-glow: rgba(56, 189, 248, 0.25);
-            --turquoise-alpha: rgba(56, 189, 248, 0.12);
-            --bg-black: #0B1628;
-            --dark-card: #111A2F;
-            --panel: rgba(255, 255, 255, 0.05);
-            --panel-strong: rgba(255, 255, 255, 0.12);
-            --glass: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --text-muted: #94A3B8;
-            --text-soft: #E2E8F0;
-            --danger: #FB7185;
-            --success: #2DD4BF;
-            --shadow-premium: 0 20px 55px rgba(0, 0, 0, 0.42);
-            --shadow-line: 0 0 0 1px rgba(255,255,255,0.08), 0 22px 48px rgba(0,0,0,0.32);
+        :root {
+            --bg: #030712;
+            --panel: rgba(6, 14, 29, 0.78);
+            --panel-strong: rgba(7, 15, 32, 0.9);
+            --stroke: rgba(71, 117, 190, 0.32);
+            --stroke-bright: rgba(43, 116, 255, 0.62);
+            --blue: #2967ff;
+            --blue-2: #0c7cff;
+            --text: #f7f9ff;
+            --muted: #9aa5bb;
+            --soft: #66718a;
+            --danger: #ff6171;
+            --success: #54e3b4;
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            letter-spacing: 0;
         }
 
-        body { 
-            background: var(--bg-black);
+        html {
+            min-height: 100%;
+            background: var(--bg);
+            color-scheme: dark;
+        }
+
+        body {
+            min-height: 100svh;
+            overflow-x: hidden;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--text);
             background:
-                radial-gradient(circle at 20% 10%, rgba(56,189,248,0.16) 0%, transparent 28%),
-                radial-gradient(circle at 80% 15%, rgba(45,212,191,0.10) 0%, transparent 24%),
-                linear-gradient(180deg, #07111E 0%, #0B1628 45%, #081623 100%);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            overflow: hidden;
-            position: relative;
+                radial-gradient(circle at 72% 18%, rgba(16, 95, 255, 0.26), transparent 26%),
+                radial-gradient(circle at 12% 84%, rgba(0, 79, 255, 0.34), transparent 28%),
+                linear-gradient(180deg, #020610 0%, #030813 48%, #02040a 100%);
         }
 
-        /* Animated background elements */
-        .bg-glow {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.15;
-            filter: blur(120px);
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
             z-index: 0;
+            background:
+                linear-gradient(90deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.36) 40%, rgba(0, 0, 0, 0.08) 66%, rgba(0, 0, 0, 0.48) 100%),
+                radial-gradient(ellipse at 50% 91%, rgba(37, 101, 255, 0.34) 0%, rgba(4, 13, 32, 0.78) 34%, rgba(0, 0, 0, 0) 64%);
+            pointer-events: none;
         }
 
-        .glow-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--turquoise) 0%, transparent 70%);
-            top: -10%;
-            right: -10%;
-            animation: float 15s ease-in-out infinite;
+        body::after {
+            content: "";
+            position: fixed;
+            left: -8vw;
+            right: -8vw;
+            bottom: -4vh;
+            height: 33vh;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at center, rgba(20, 84, 231, 0.36), transparent 62%),
+                repeating-linear-gradient(7deg, rgba(59, 111, 224, 0.18) 0 1px, transparent 1px 34px),
+                repeating-linear-gradient(-7deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 40px);
+            opacity: 0.54;
+            filter: blur(0.2px);
+            transform: perspective(620px) rotateX(58deg);
+            transform-origin: bottom;
+            pointer-events: none;
         }
 
-        .glow-2 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(0, 88, 84, 0.8) 0%, transparent 70%);
-            bottom: -5%;
-            left: -5%;
-            animation: float 20s ease-in-out infinite reverse;
+        a,
+        button {
+            font: inherit;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -30px); }
-        }
-
-        .auth-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            width: 100%;
-            max-width: 1000px;
-            padding: 40px;
-            position: relative;
-            z-index: 10;
-            align-items: center;
-        }
-
-        /* Left side - Branding */
-        .auth-branding {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 30px;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .logo-icon {
-            font-size: 40px;
-            text-shadow: 0 0 20px var(--turquoise-glow);
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .logo-text span {
-            color: var(--turquoise);
-            text-shadow: 0 0 15px var(--turquoise-glow);
-        }
-
-        .brand-description {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.8;
-            max-width: 350px;
-        }
-
-        .feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 30px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            color: var(--text-soft);
-        }
-
-        .feature-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--turquoise-alpha);
-            border: 1px solid var(--turquoise);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: var(--turquoise);
-            flex-shrink: 0;
-        }
-
-        /* Right side - Form */
-        .auth-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025));
-            backdrop-filter: blur(20px) saturate(130%);
-            -webkit-backdrop-filter: blur(20px) saturate(130%);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 50px;
-            box-shadow: var(--shadow-line);
-            width: 100%;
-            max-width: 420px;
-            animation: slideIn 0.6s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .form-header {
-            margin-bottom: 40px;
-        }
-
-        h2 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .form-subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
-        .field {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            color: var(--turquoise);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+        button {
+            border: 0;
+            cursor: pointer;
         }
 
         input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-radius: 12px;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.3s;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
+            font: inherit;
         }
 
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        input:focus {
-            border-color: var(--turquoise);
-            background: rgba(56,189,248,0.08);
-            box-shadow: 0 0 18px rgba(56,189,248,0.24);
-        }
-
-        input:hover {
-            border-color: rgba(56,189,248,0.4);
-        }
-
-        .btn-auth {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--turquoise) 0%, var(--turquoise-hover) 100%);
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-size: 13px;
+        .auth-page {
             position: relative;
+            z-index: 1;
+            min-height: 100svh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding: clamp(22px, 3.3vw, 58px) clamp(18px, 3.6vw, 70px) 26px;
             overflow: hidden;
         }
 
-        .btn-auth::before {
-            content: '';
+        .auth-page::before,
+        .auth-page::after {
+            content: "";
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
             pointer-events: none;
         }
 
-        .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 18px 34px rgba(56, 189, 248, 0.25);
+        .auth-page::before {
+            width: 18vw;
+            height: 32vw;
+            min-width: 190px;
+            min-height: 330px;
+            top: 5.4vh;
+            right: 31vw;
+            border: 1.5px solid rgba(19, 104, 255, 0.78);
+            border-bottom-color: transparent;
+            box-shadow: 0 0 28px rgba(28, 119, 255, 0.48), inset 0 0 18px rgba(28, 119, 255, 0.22);
+            transform: skewX(24deg);
+            opacity: 0.72;
         }
 
-        .btn-auth:hover::before {
-            width: 300px;
-            height: 300px;
+        .auth-page::after {
+            width: 18vw;
+            height: 28vw;
+            min-width: 178px;
+            min-height: 292px;
+            top: 5.6vh;
+            right: 2vw;
+            border: 1.5px solid rgba(19, 104, 255, 0.74);
+            border-left-color: transparent;
+            box-shadow: 0 0 32px rgba(28, 119, 255, 0.46), inset 0 0 18px rgba(28, 119, 255, 0.18);
+            transform: skewX(-20deg);
+            opacity: 0.72;
         }
 
-        .btn-auth:active {
-            transform: translateY(0);
+        .topbar {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand-group {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(18px, 3vw, 44px);
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .brand-mark {
+            position: relative;
+            width: 50px;
+            height: 45px;
+            filter: drop-shadow(0 0 15px rgba(43, 103, 255, 0.74));
+        }
+
+        .brand-mark::before,
+        .brand-mark::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            width: 18px;
+            height: 42px;
+            background: linear-gradient(150deg, #7e95ff 0%, #245dff 48%, #091a64 100%);
+            clip-path: polygon(0 0, 100% 0, 56% 100%, 20% 100%);
+        }
+
+        .brand-mark::before {
+            left: 5px;
+            transform: skewX(18deg);
+        }
+
+        .brand-mark::after {
+            right: 6px;
+            transform: skewX(-18deg);
+        }
+
+        .brand-text {
+            font-size: clamp(28px, 2.2vw, 36px);
+            font-weight: 950;
+            font-style: italic;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .brand-text span {
+            color: #356aff;
+        }
+
+        .tagline {
+            min-height: 44px;
+            padding-left: clamp(20px, 2.4vw, 40px);
+            border-left: 1px solid rgba(113, 126, 158, 0.3);
+            display: grid;
+            align-content: center;
+            color: #a4abc0;
+            font-size: clamp(12px, 0.95vw, 16px);
+            line-height: 1.55;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+        }
+
+        .language {
+            position: relative;
+            width: 198px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 33px;
+            color: #eef4ff;
+            isolation: isolate;
+        }
+
+        .language::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            border: 1px solid rgba(31, 103, 255, 0.74);
+            background: rgba(3, 11, 26, 0.54);
+            transform: skewX(-24deg);
+            box-shadow: inset 0 0 28px rgba(31, 103, 255, 0.12), 0 0 26px rgba(31, 103, 255, 0.2);
+        }
+
+        .language button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 82px;
+            height: 38px;
+            background: transparent;
+            color: inherit;
+        }
+
+        .language svg {
+            width: 19px;
+            height: 19px;
+            color: #a9b5cf;
+        }
+
+        .language span {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(330px, 0.86fr) minmax(386px, 520px) minmax(330px, 0.94fr);
+            align-items: center;
+            gap: clamp(24px, 3vw, 54px);
+            min-height: min(720px, calc(100svh - 170px));
+            padding: clamp(24px, 3vw, 54px) 0 12px;
+        }
+
+        .left-copy {
+            position: relative;
+            z-index: 2;
+            align-self: center;
+            display: grid;
+            gap: 34px;
+            max-width: 455px;
+        }
+
+        .headline h1 {
+            font-size: clamp(62px, 6.5vw, 102px);
+            line-height: 0.9;
+            font-style: italic;
+            font-weight: 950;
+            text-transform: uppercase;
+            background: linear-gradient(100deg, #fff 0%, #dce3ef 34%, #1d5dff 46%, #356fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 18px rgba(43, 103, 255, 0.3));
+        }
+
+        .headline p {
+            margin-top: 22px;
+            color: #aab2c7;
+            font-size: clamp(17px, 1.28vw, 22px);
+            line-height: 1.45;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+        }
+
+        .benefits {
+            display: grid;
+            gap: 0;
+            max-width: 420px;
+        }
+
+        .benefit {
+            min-height: 78px;
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 22px;
+            align-items: center;
+            border-bottom: 1px solid rgba(111, 125, 158, 0.14);
+        }
+
+        .benefit-icon {
+            width: 58px;
+            height: 58px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(42, 105, 255, 0.22);
+            border-radius: 9px;
+            background: rgba(3, 12, 28, 0.54);
+            color: #2873ff;
+            box-shadow: inset 0 0 18px rgba(40, 113, 255, 0.08), 0 0 22px rgba(40, 113, 255, 0.08);
+        }
+
+        .benefit-icon svg {
+            width: 29px;
+            height: 29px;
+            stroke-width: 1.9;
+        }
+
+        .benefit strong {
+            display: block;
+            color: #f7f9ff;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .benefit span {
+            display: block;
+            margin-top: 5px;
+            color: #8791aa;
+            font-size: 13px;
+        }
+
+        .ball {
+            position: absolute;
+            left: clamp(18px, 4.7vw, 86px);
+            bottom: clamp(-66px, -5vh, -34px);
+            z-index: 1;
+            width: clamp(112px, 12vw, 162px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 42% 34%, rgba(255, 255, 255, 0.24), transparent 12%),
+                radial-gradient(circle at 48% 50%, rgba(1, 11, 32, 0) 0 26%, rgba(2, 8, 22, 0.9) 27% 32%, transparent 33%),
+                conic-gradient(from 18deg, #06112a, #0d245f, #050b18, #0c2c75, #081021, #06112a);
+            border: 1px solid rgba(69, 122, 255, 0.45);
+            box-shadow: 0 0 36px rgba(30, 111, 255, 0.72), 0 34px 78px rgba(0, 0, 0, 0.86), inset -24px -28px 42px rgba(0, 0, 0, 0.78);
+            opacity: 0.94;
+        }
+
+        .ball::before {
+            content: "";
+            position: absolute;
+            inset: 17%;
+            background:
+                linear-gradient(36deg, transparent 45%, rgba(103, 151, 255, 0.58) 46% 48%, transparent 49%),
+                linear-gradient(-36deg, transparent 45%, rgba(103, 151, 255, 0.48) 46% 48%, transparent 49%),
+                linear-gradient(90deg, transparent 44%, rgba(103, 151, 255, 0.44) 45% 47%, transparent 48%);
+            clip-path: polygon(50% 0, 93% 30%, 77% 82%, 23% 82%, 7% 30%);
+            border: 1px solid rgba(68, 122, 255, 0.42);
+            filter: drop-shadow(0 0 9px rgba(32, 108, 255, 0.54));
         }
 
         .auth-card {
             position: relative;
-            overflow: hidden;
+            z-index: 4;
+            width: min(100%, 520px);
+            min-height: 500px;
+            padding: clamp(28px, 3vw, 40px);
+            border: 1px solid rgba(93, 126, 180, 0.34);
+            border-radius: 17px;
+            background:
+                linear-gradient(180deg, rgba(9, 18, 36, 0.88), rgba(5, 12, 24, 0.82)),
+                radial-gradient(circle at 100% 100%, rgba(255, 97, 113, 0.12), transparent 42%);
+            box-shadow:
+                0 32px 92px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                0 0 42px rgba(25, 91, 255, 0.12);
+            backdrop-filter: blur(18px);
         }
 
-        .auth-card::before {
-            content: '';
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(56,189,248,0.18), transparent 60%);
-            pointer-events: none;
+        .auth-card[data-mode="register"] {
+            min-height: 620px;
         }
 
-        .auth-card::after {
-            content: '';
-            position: absolute;
-            bottom: -30px;
-            left: -20px;
-            width: 260px;
-            height: 260px;
-            background: radial-gradient(circle, rgba(45,212,191,0.12), transparent 60%);
-            pointer-events: none;
+        .auth-card h2 {
+            font-size: clamp(25px, 2vw, 30px);
+            line-height: 1.1;
+            font-weight: 850;
+            color: #fff;
         }
 
-        .field input {
-            border-radius: 16px;
-            font-size: 15px;
-            min-height: 52px;
-            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.18);
+        .auth-card .subtitle {
+            margin-top: 14px;
+            color: #a1abc1;
+            font-size: 16px;
         }
 
-        .field label {
-            letter-spacing: 0.9px;
-            margin-bottom: 12px;
+        .auth-form {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
         }
 
-        .form-header {
-            margin-bottom: 36px;
+        .field {
+            display: grid;
+            gap: 7px;
         }
 
-        .form-header h2 {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .form-header .form-subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            line-height: 1.8;
-            max-width: 360px;
-        }
-
-        .feature-list {
-            gap: 18px;
-        }
-
-        .feature-item {
-            gap: 14px;
-            font-size: 14px;
-        }
-
-        .feature-icon {
-            width: 30px;
-            height: 30px;
-            font-size: 14px;
-        }
-
-        .toggle-section {
-            text-align: center;
-            margin-top: 28px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .toggle-link {
-            font-size: 13px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .toggle-link:hover {
-            color: var(--text-soft);
-        }
-
-        .toggle-link span {
-            color: var(--turquoise);
-            font-weight: 600;
-            text-decoration: underline;
-            text-decoration-color: transparent;
-            transition: text-decoration-color 0.3s;
-        }
-
-        .toggle-link:hover span {
-            text-decoration-color: var(--turquoise);
-        }
-
-        /* Ban overlay */
-        #ban-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(30, 10, 10, 0.9));
-            display: none;
-            flex-direction: column;
-            justify-content: center;
+        .input-wrap {
+            position: relative;
+            display: flex;
             align-items: center;
-            z-index: 9999;
+        }
+
+        .input-wrap svg {
+            position: absolute;
+            left: 20px;
+            width: 21px;
+            height: 21px;
+            color: #2d73ff;
+            pointer-events: none;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            height: 58px;
+            padding: 0 55px 0 54px;
+            border: 1px solid rgba(91, 118, 161, 0.34);
+            border-radius: 8px;
+            outline: 0;
+            background: rgba(4, 12, 27, 0.76);
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .input-wrap input::placeholder {
+            color: #8d96ab;
+        }
+
+        .input-wrap input:focus {
+            border-color: rgba(43, 111, 255, 0.78);
+            background: rgba(6, 16, 35, 0.96);
+            box-shadow: 0 0 0 4px rgba(43, 111, 255, 0.12), 0 0 26px rgba(43, 111, 255, 0.12);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: 7px;
+            background: transparent;
+            color: #c8d2e7;
+        }
+
+        .password-toggle svg {
+            position: static;
+            color: currentColor;
+            pointer-events: auto;
+        }
+
+        .field-error {
+            min-height: 16px;
+            color: var(--danger);
+            font-size: 12px;
+        }
+
+        .password-meter {
+            height: 4px;
+            margin-top: 2px;
+            overflow: hidden;
+            border-radius: 99px;
+            background: rgba(94, 113, 147, 0.2);
+        }
+
+        .password-meter span {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #2967ff, #54e3b4);
+            transition: width 0.2s ease;
+        }
+
+        .auth-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-top: -2px;
+            color: #8f99ae;
+            font-size: 13px;
+        }
+
+        .remember {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember input {
+            width: 20px;
+            height: 20px;
+            accent-color: #2b66ff;
+        }
+
+        .link-button {
+            background: transparent;
+            color: #2f73ff;
+            white-space: nowrap;
+        }
+
+        .link-button:hover {
+            color: #7ba5ff;
+        }
+
+        .terms-row {
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            gap: 10px;
+            align-items: start;
+            color: #9ba6bb;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .terms-row input {
+            width: 20px;
+            height: 20px;
+            accent-color: #2b66ff;
+        }
+
+        .auth-feedback {
+            display: none;
+            padding: 11px 13px;
+            border-radius: 8px;
+            border: 1px solid rgba(43, 111, 255, 0.26);
+            background: rgba(43, 111, 255, 0.1);
+            color: #b8c8ff;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .auth-feedback.error {
+            border-color: rgba(255, 97, 113, 0.36);
+            background: rgba(255, 97, 113, 0.09);
+            color: #ffb6be;
+        }
+
+        .auth-feedback.success {
+            border-color: rgba(84, 227, 180, 0.34);
+            background: rgba(84, 227, 180, 0.09);
+            color: #adf4dd;
+        }
+
+        .btn-auth {
+            position: relative;
+            width: 100%;
+            height: 58px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #3374ff 0%, #1f55ec 100%);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 850;
+            box-shadow: 0 18px 42px rgba(34, 91, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 22px 48px rgba(34, 91, 255, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.38);
+        }
+
+        .btn-auth:disabled {
+            opacity: 0.64;
+            cursor: wait;
+            transform: none;
+        }
+
+        .btn-auth svg {
+            position: absolute;
+            right: 19px;
+            width: 22px;
+            height: 22px;
+        }
+
+        .divider {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 14px;
+            color: #707a91;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            height: 1px;
+            background: rgba(122, 139, 177, 0.18);
+        }
+
+        .alt-login {
+            position: relative;
+        }
+
+        .alt-login-main {
+            width: 100%;
+            height: 51px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: 1px solid rgba(43, 111, 255, 0.42);
+            border-radius: 8px;
+            background: rgba(3, 12, 29, 0.58);
+            color: #f7f9ff;
+            font-size: 14px;
+        }
+
+        .alt-login-main svg {
+            width: 19px;
+            height: 19px;
+            color: #2f73ff;
+        }
+
+        .alt-login-main .chevron {
+            margin-left: auto;
+            margin-right: 17px;
+        }
+
+        .alt-login-list {
+            position: absolute;
+            inset: calc(100% + 8px) 0 auto 0;
+            z-index: 8;
+            display: none;
+            padding: 8px;
+            border: 1px solid rgba(43, 111, 255, 0.34);
+            border-radius: 9px;
+            background: rgba(5, 13, 29, 0.98);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+        }
+
+        .alt-login.open .alt-login-list {
+            display: grid;
+        }
+
+        .alt-login-list button {
+            min-height: 42px;
+            padding: 0 12px;
+            border-radius: 7px;
+            background: transparent;
+            color: #cbd5ec;
+            text-align: left;
+        }
+
+        .alt-login-list button:hover {
+            background: rgba(43, 111, 255, 0.13);
+            color: #fff;
+        }
+
+        .switch-line {
+            color: #8e98ae;
             text-align: center;
-            backdrop-filter: blur(10px);
+            font-size: 15px;
         }
 
-        .ban-icon {
-            font-size: 100px;
-            color: var(--danger);
-            margin-bottom: 30px;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        #ban-overlay h1 {
-            font-size: 32px;
-            color: var(--danger);
-            margin-bottom: 16px;
+        .switch-line button {
+            margin-left: 8px;
+            background: transparent;
+            color: #3677ff;
             font-weight: 700;
         }
 
-        #ban-overlay p {
-            font-size: 14px;
-            color: var(--text-soft);
-            max-width: 400px;
-            line-height: 1.8;
-            margin-bottom: 30px;
+        .girl-wrap {
+            position: relative;
+            align-self: end;
+            min-height: min(720px, calc(100svh - 140px));
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .auth-container {
-                grid-template-columns: 1fr;
-                padding: 24px;
-                gap: 30px;
+        .girl-wrap::before {
+            content: "";
+            position: absolute;
+            width: 58%;
+            aspect-ratio: 1;
+            left: 12%;
+            top: 15%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(31, 111, 255, 0.5), rgba(31, 111, 255, 0.15) 38%, transparent 70%);
+            filter: blur(22px);
+            animation: glowPulse 4.8s ease-in-out infinite alternate;
+        }
+
+        .girl {
+            position: absolute;
+            right: min(0px, -1vw);
+            bottom: -28px;
+            width: min(47vw, 610px);
+            min-width: 390px;
+            max-height: calc(100svh - 84px);
+            object-fit: contain;
+            object-position: right bottom;
+            filter:
+                drop-shadow(0 0 18px rgba(55, 115, 255, 0.64))
+                drop-shadow(0 30px 74px rgba(0, 0, 0, 0.62));
+            -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 84%, rgba(0, 0, 0, 0) 100%);
+            mask-image: linear-gradient(180deg, #000 0%, #000 84%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .secure-footer {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, auto));
+            justify-content: center;
+            gap: clamp(28px, 5vw, 76px);
+            color: #7f899e;
+            font-size: 13px;
+            padding-top: 10px;
+        }
+
+        .secure-item {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 190px);
+            gap: 14px;
+            align-items: center;
+        }
+
+        .secure-item svg {
+            width: 34px;
+            height: 34px;
+            color: #236bff;
+        }
+
+        .copyright {
+            margin-top: 26px;
+            color: #6c7486;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .modal,
+        #ban-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: none;
+            place-items: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content,
+        .ban-card,
+        .verification-card {
+            width: min(520px, 100%);
+            border: 1px solid rgba(84, 126, 210, 0.34);
+            border-radius: 16px;
+            background: rgba(7, 15, 32, 0.98);
+            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.54);
+        }
+
+        .modal-content {
+            max-height: min(720px, calc(100svh - 40px));
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(116, 134, 176, 0.16);
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+        }
+
+        .modal-close,
+        .verification-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .modal-body {
+            overflow: auto;
+            padding: 20px;
+            color: #aeb8ce;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .modal-body h3 {
+            margin: 14px 0 8px;
+            color: #fff;
+            font-size: 17px;
+        }
+
+        .modal-body p {
+            margin: 8px 0;
+        }
+
+        .verification-card,
+        .ban-card {
+            position: relative;
+            display: grid;
+            gap: 14px;
+            padding: 30px;
+            text-align: center;
+            color: #dbe5fb;
+        }
+
+        .verification-close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+        }
+
+        .verification-mark {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 6px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #3374ff, #1f55ec);
+            font-size: 29px;
+            font-weight: 950;
+        }
+
+        .verification-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-secondary {
+            min-height: 46px;
+            padding: 0 14px;
+            border: 1px solid rgba(43, 111, 255, 0.38);
+            border-radius: 8px;
+            background: rgba(43, 111, 255, 0.12);
+            color: #fff;
+            font-weight: 750;
+        }
+
+        .particles {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particles i {
+            position: absolute;
+            width: 5px;
+            height: 17px;
+            border-radius: 8px;
+            background: #1261ff;
+            box-shadow: 0 0 14px rgba(18, 97, 255, 0.8);
+            opacity: 0.6;
+            transform: rotate(-28deg);
+            animation: particleFloat 7s linear infinite;
+        }
+
+        .particles i:nth-child(1) { left: 33%; top: 7%; animation-delay: -1s; }
+        .particles i:nth-child(2) { left: 40%; top: 31%; animation-delay: -4s; }
+        .particles i:nth-child(3) { left: 17%; top: 45%; animation-delay: -2s; }
+        .particles i:nth-child(4) { left: 83%; top: 48%; animation-delay: -5s; }
+        .particles i:nth-child(5) { left: 88%; top: 10%; animation-delay: -3s; }
+        .particles i:nth-child(6) { left: 7%; top: 76%; animation-delay: -6s; }
+        .particles i:nth-child(7) { left: 53%; top: 12%; animation-delay: -1.6s; }
+        .particles i:nth-child(8) { left: 69%; top: 63%; animation-delay: -4.7s; }
+
+        @keyframes particleFloat {
+            from { opacity: 0; transform: translate3d(0, 40px, 0) rotate(-28deg); }
+            22%, 70% { opacity: 0.68; }
+            to { opacity: 0; transform: translate3d(24px, -80px, 0) rotate(-28deg); }
+        }
+
+        @keyframes glowPulse {
+            from { opacity: 0.5; transform: scale(0.96); }
+            to { opacity: 0.9; transform: scale(1.05); }
+        }
+
+        @media (max-width: 1180px) {
+            .hero {
+                grid-template-columns: minmax(310px, 0.88fr) minmax(360px, 470px);
             }
 
-            .auth-branding {
+            .girl-wrap {
+                position: absolute;
+                right: -11vw;
+                bottom: 0;
+                width: 45vw;
+                min-height: 650px;
+                opacity: 0.55;
+            }
+
+            .girl {
+                width: 520px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .auth-page {
+                display: block;
+                padding: 20px 16px 24px;
+            }
+
+            .topbar {
+                margin-bottom: 22px;
+            }
+
+            .tagline,
+            .language,
+            .left-copy,
+            .girl-wrap,
+            .ball,
+            .auth-page::before,
+            .auth-page::after {
                 display: none;
             }
 
+            .hero {
+                display: block;
+                min-height: 0;
+                padding: 0;
+            }
+
             .auth-card {
-                max-width: 100%;
-                padding: 32px;
+                width: min(520px, 100%);
+                margin: 0 auto;
             }
 
-            .bg-glow {
-                filter: blur(60px);
-                opacity: 0.08;
+            .secure-footer {
+                width: min(520px, 100%);
+                margin: 22px auto 0;
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .brand-mark {
+                width: 42px;
+                height: 38px;
             }
 
-            .glow-1 {
-                width: 300px;
-                height: 300px;
+            .brand-text {
+                font-size: 26px;
             }
 
-            .glow-2 {
-                width: 200px;
-                height: 200px;
+            .auth-card {
+                padding: 22px;
+                min-height: 0;
+                border-radius: 14px;
+            }
+
+            .auth-card[data-mode="register"] {
+                min-height: 0;
+            }
+
+            .auth-row,
+            .verification-actions {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .auth-row {
+                display: grid;
+                gap: 10px;
+            }
+
+            .input-wrap input,
+            .btn-auth {
+                height: 54px;
             }
         }
     </style>
 </head>
 <body>
-
-    <div class="bg-glow glow-1"></div>
-    <div class="bg-glow glow-2"></div>
-
-    <div id="ban-overlay">
-        <div class="ban-icon">⛔</div>
-        <h1>ВАШ АККАУНТ ЗАБЛОКИРОВАН</h1>
-        <p>Вы нарушили правила пользования платформой VisBET.<br>Доступ к функциям ставок ограничен.</p>
-        <button onclick="clearBannedSession()" class="btn-auth" style="width: auto; padding: 12px 40px; background: linear-gradient(135deg, var(--danger) 0%, #e63a3a 100%); max-width: fit-content;">Войти другим аккаунтом</button>
-    </div>
-
-    <div class="auth-container" id="auth-form">
-        <!-- Left side - Branding -->
-        <div class="auth-branding">
-            <div class="logo-section">
-                <div class="logo-icon"></div>
-                <div>
-                    <div class="logo-text">Vis<span>BET</span></div>
-                </div>
-            </div>
-
-            <div class="brand-description">
-                VisBET — это современный портал для ставок, где интерфейс построен под скорость, безопасность и интеллектуальную аналитику.
-            </div>
-
-            <div class="feature-list">
-                <div class="feature-item">
-                    <div class="feature-icon">⚡</div>
-                    <span>Молниеносный вход и простой купон</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🔒</div>
-                    <span>Надёжная защита данных и платежей</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🎁</div>
-                    <span>Стартовый бонус 1000 ₽ на первый депозит</span>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">⭐</div>
-                    <span>Персональные рекомендации и VIP-статус</span>
-                </div>
-            </div>
+    <main class="auth-page" id="auth-form">
+        <div class="particles" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
 
-        <!-- Right side - Form -->
-        <div class="auth-card">
-            <div class="form-header">
-                <h2 id="form-title">Регистрация</h2>
-                <div class="form-subtitle" id="form-subtitle">Создайте аккаунт для начала игры</div>
+        <header class="topbar">
+            <div class="brand-group">
+                <a class="brand" href="index.html" aria-label="VISBET">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    <span class="brand-text">VIS<span>BET</span></span>
+                </a>
+                <div class="tagline">Твоя победа —<br>наш приоритет</div>
             </div>
 
-            <div class="field">
-                <label>Имя пользователя</label>
-                <input type="text" id="username" placeholder="Ivanov777">
+            <div class="language">
+                <button type="button" id="language-button" aria-label="Выбор языка">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+                    <span>RU</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
             </div>
+        </header>
 
-            <div class="field">
-                <label>Пароль</label>
-                <input type="password" id="password" placeholder="Минимум 6 символов">
-            </div>
-
-            <button class="btn-auth" id="main-btn" onclick="handleAuth()">СОЗДАТЬ АККАУНТ</button>
-
-            <div class="toggle-section">
-                <div class="toggle-link" onclick="toggleMode()">
-                    <span id="toggle-text">Уже есть аккаунт? <span>Войти</span></span>
+        <section class="hero">
+            <div class="left-copy">
+                <div class="headline">
+                    <h1>VISBET</h1>
+                    <p>Профессиональная<br>платформа ставок</p>
                 </div>
+
+                <div class="benefits" aria-label="Преимущества">
+                    <div class="benefit">
+                        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2 3 14h8l-1 8 11-14h-8l0-6Z"/></svg></div>
+                        <div><strong>Быстрые выплаты</strong><span>Мгновенные выплаты 24/7</span></div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M5 6H3v2a4 4 0 0 0 4 4M19 6h2v2a4 4 0 0 1-4 4"/></svg></div>
+                        <div><strong>Лучшие коэффициенты</strong><span>Высокие коэффициенты каждый день</span></div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                        <div><strong>Надежная платформа</strong><span>Безопасность и честная игра</span></div>
+                    </div>
+                    <div class="benefit">
+                        <div class="benefit-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5ZM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5Z"/></svg></div>
+                        <div><strong>24/7 поддержка</strong><span>Мы всегда на связи</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="auth-card" data-mode="login" aria-labelledby="form-title">
+                <h2 id="form-title">Вход в аккаунт</h2>
+                <p class="subtitle" id="form-subtitle">Добро пожаловать обратно!</p>
+
+                <form class="auth-form" id="login-form" novalidate>
+                    <div class="field">
+                        <div class="input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="email" placeholder="Логин или e-mail" autocomplete="username" inputmode="email">
+                        </div>
+                        <div class="field-error" id="email-error"></div>
+                    </div>
+
+                    <div class="field">
+                        <div class="input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="password" placeholder="Пароль" autocomplete="current-password">
+                            <button class="password-toggle" type="button" id="password-toggle" aria-label="Показать пароль">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a18.4 18.4 0 0 1-2.16 3.19M14.12 14.12A3 3 0 0 1 9.88 9.88M3 3l18 18M6.61 6.61C3.94 8.35 2 12 2 12s3 8 10 8a10.8 10.8 0 0 0 5.39-1.61"/></svg>
+                            </button>
+                        </div>
+                        <div class="password-meter" id="password-meter"><span></span></div>
+                        <div class="field-error" id="password-error"></div>
+                    </div>
+
+                    <div class="field" id="confirm-field">
+                        <div class="input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="confirm-password" placeholder="Повторите пароль" autocomplete="new-password">
+                        </div>
+                        <div class="field-error" id="confirm-error"></div>
+                    </div>
+
+                    <div class="auth-row" id="login-options">
+                        <label class="remember"><input type="checkbox" id="remember-me" checked> <span>Запомнить меня</span></label>
+                        <button class="link-button" type="button" id="forgot-button">Забыли пароль?</button>
+                    </div>
+
+                    <div class="terms-row" id="terms-field">
+                        <input type="checkbox" id="accept-terms" aria-label="Принять условия использования VisBET">
+                        <span>Я принимаю <button class="link-button" type="button" id="terms-button">условия использования</button> VISBET.</span>
+                    </div>
+                    <div class="field-error" id="terms-error"></div>
+
+                    <div class="auth-feedback" id="auth-feedback"></div>
+
+                    <button class="btn-auth" id="main-btn" type="submit">
+                        <span>Войти</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                    </button>
+
+                    <div class="divider"><span>или</span></div>
+
+                    <div class="alt-login" id="alt-login">
+                        <button class="alt-login-main" type="button" id="alt-login-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span>Дополнительные действия</span>
+                            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="alt-login-list" role="menu">
+                            <button type="button" data-alt-message="Для администратора введите логин Admin и пароль администратора.">Администратор</button>
+                        </div>
+                    </div>
+
+                    <p class="switch-line"><span id="switch-text">Еще нет аккаунта?</span><button type="button" id="switch-mode">Регистрация</button></p>
+                </form>
+            </section>
+
+            <div class="girl-wrap" aria-hidden="true">
+                <img class="girl" src="loaging.png" alt="">
+            </div>
+            <div class="ball" aria-hidden="true"></div>
+        </section>
+
+        <footer>
+            <div class="secure-footer">
+                <div class="secure-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>Ваши данные защищены<br>256-bit SSL шифрование</span>
+                </div>
+                <div class="secure-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m15.48 12.89.94 3.27-2.93-1.76-2.93 1.76.94-3.27-2.64-2.15 3.39-.12L13.49 7.5l1.24 3.12 3.39.12-2.64 2.15Z"/><path d="M5 16.5 3 22l5.5-2M19 16.5l2 5.5-5.5-2"/><circle cx="12" cy="11" r="8"/></svg>
+                    <span>Лицензированная<br>платформа</span>
+                </div>
+                <div class="secure-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                    <span>Нам доверяют более<br>50 000 игроков</span>
+                </div>
+            </div>
+            <div class="copyright">© 2024 VISBET. Все права защищены.</div>
+        </footer>
+    </main>
+
+    <div class="modal" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="terms-modal-title">Условия использования VISBET</h2>
+                <button class="modal-close" type="button" id="terms-close" aria-label="Закрыть окно">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>1. Общие положения</h3>
+                <p>Используя платформу VISBET, пользователь подтверждает согласие с правилами сервиса, политикой безопасности и требованиями ответственной игры.</p>
+                <h3>2. Аккаунт</h3>
+                <p>Пользователь обязуется указывать корректные данные, хранить пароль в безопасности и не передавать доступ к аккаунту третьим лицам.</p>
+                <h3>3. Финансовые операции</h3>
+                <p>Платформа может проводить проверки операций для защиты пользователей и предотвращения мошенничества.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="ban-overlay">
+        <div class="ban-card">
+            <h2>Аккаунт заблокирован</h2>
+            <p>Доступ к функциям VISBET ограничен. Войдите другим аккаунтом или обратитесь к администратору.</p>
+            <button type="button" class="btn-auth" id="clear-ban-button"><span>Войти другим аккаунтом</span></button>
+        </div>
+    </div>
+
+    <div class="modal" id="verification-panel" role="dialog" aria-modal="true" aria-labelledby="verification-title">
+        <div class="verification-card">
+            <button class="verification-close" type="button" id="verification-close" aria-label="Закрыть окно">&times;</button>
+            <div class="verification-mark">V</div>
+            <h2 id="verification-title">Подтвердите email</h2>
+            <p id="verification-text">Мы отправили письмо со ссылкой подтверждения.</p>
+            <div class="verification-actions">
+                <button type="button" class="btn-secondary" id="resend-verification">Отправить еще раз</button>
+                <button type="button" class="btn-secondary" id="check-verification">Я подтвердил</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            sendEmailVerification,
+            sendPasswordResetEmail,
+            setPersistence,
+            browserLocalPersistence,
+            browserSessionPersistence,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBKXVkuU3L_bxNIdXyDmUMcZHlpS7IF_Fw",
@@ -559,130 +1218,474 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const $ = (id) => document.getElementById(id);
 
-        let isLoginMode = false;
+        const WELCOME_BONUS = 1000;
+        let authMode = "login";
 
-        window.toggleMode = () => {
-            isLoginMode = !isLoginMode;
-            const titleEl = document.getElementById('form-title');
-            const subtitleEl = document.getElementById('form-subtitle');
-            const btnEl = document.getElementById('main-btn');
-            const toggleEl = document.getElementById('toggle-text');
-            
-            if (isLoginMode) {
-                titleEl.innerText = "Вход";
-                subtitleEl.innerText = "Введите данные для входа в аккаунт";
-                btnEl.innerText = "ВОЙТИ";
-                toggleEl.innerHTML = "Нет аккаунта?<p><span>Зарегистрироваться</span></p>";
-            } else {
-                titleEl.innerText = "Регистрация";
-                subtitleEl.innerText = "Создайте аккаунт для начала игры";
-                btnEl.innerText = "СОЗДАТЬ АККАУНТ";
-                toggleEl.innerHTML = "Уже есть аккаунт?<p><span>Войти</span></p>";
-            }
-            
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        };
-
-        window.handleAuth = async () => {
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-
-            if (!user || !pass) {
-                alert("Заполните все поля!");
-                return;
-            }
-
-            if (!isLoginMode && pass.length < 6) {
-                alert("Пароль должен содержать минимум 6 символов!");
-                return;
-            }
-
-            const userRef = doc(db, "users", user);
-
-            try {
-                const snap = await getDoc(userRef);
-
-                if (isLoginMode) {
-                    // --- ЛОГИКА ВХОДА ---
-                    if (snap.exists()) {
-                        const data = snap.data();
-                        
-                        if (data.isBanned) {
-                            localStorage.removeItem('visbet_user');
-                            showBanScreen();
-                            return;
-                        }
-
-                        if (data.password === pass) {
-                            localStorage.setItem('visbet_user', user);
-                            location.href = 'index.html';
-                        } else {
-                            alert("Неверный пароль!");
-                        }
-                    } else {
-                        alert("Пользователь не найден!");
-                    }
-                } else {
-                    // --- ЛОГИКА РЕГИСТРАЦИИ ---
-                    if (snap.exists()) {
-                        alert("Это имя уже занято!");
-                    } else {
-                        await setDoc(userRef, {
-                            username: user,
-                            password: pass,
-                            balance: 1000,
-                            isBanned: false,
-                            regDate: new Date().toISOString()
-                        });
-                        localStorage.setItem('visbet_user', user);
-                        alert("Регистрация успешна! Добро пожаловать в VisBET!");
-                        location.href = 'index.html';
-                    }
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Ошибка доступа к базе данных.");
-            }
-        };
-
-        function showBanScreen() {
-            document.getElementById('auth-form').style.display = 'none';
-            document.getElementById('ban-overlay').style.display = 'flex';
+        function normalizeEmail(value) {
+            return String(value || "").trim().toLowerCase();
         }
 
-        function clearBannedSession() {
-            localStorage.removeItem('visbet_user');
-            document.getElementById('ban-overlay').style.display = 'none';
-            document.getElementById('auth-form').style.display = 'grid';
+        function getUserDocId(email) {
+            return normalizeEmail(email).replace(/\//g, "%2F");
         }
 
-        async function checkCurrentSession() {
-            const savedUser = localStorage.getItem('visbet_user');
-            if (savedUser) {
-                try {
-                    const snap = await getDoc(doc(db, "users", savedUser));
-                    if (snap.exists() && snap.data().isBanned) {
-                        showBanScreen();
-                    }
-                } catch (e) {
-                    console.warn("Session check failed:", e);
+        function isValidEmail(value) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
+        }
+
+        function passwordScore(password) {
+            let score = 0;
+            if (password.length >= 8) score += 35;
+            if (password.length >= 12) score += 20;
+            if (/[A-ZА-Я]/.test(password)) score += 15;
+            if (/[0-9]/.test(password)) score += 15;
+            if (/[^A-Za-zА-Яа-я0-9]/.test(password)) score += 15;
+            return Math.min(score, 100);
+        }
+
+        function setFieldError(id, message = "") {
+            const el = $(id);
+            if (el) el.textContent = message;
+        }
+
+        function clearErrors() {
+            ["email-error", "password-error", "confirm-error", "terms-error"].forEach((id) => setFieldError(id));
+        }
+
+        function showFeedback(message, type = "info") {
+            const box = $("auth-feedback");
+            if (!box) return;
+            box.className = `auth-feedback ${type === "error" ? "error" : type === "success" ? "success" : ""}`;
+            box.textContent = message;
+            box.style.display = message ? "block" : "none";
+        }
+
+        function setBusy(isBusy) {
+            const btn = $("main-btn");
+            if (!btn) return;
+            btn.disabled = isBusy;
+            btn.querySelector("span").textContent = isBusy ? "Проверяем..." : authMode === "login" ? "Войти" : "Создать аккаунт";
+        }
+
+        function mapAuthError(error) {
+            const messages = {
+                "auth/email-already-in-use": "Этот email уже зарегистрирован.",
+                "auth/invalid-email": "Введите корректный email.",
+                "auth/invalid-credential": "Неверный email или пароль.",
+                "auth/user-not-found": "Пользователь с таким email не найден.",
+                "auth/wrong-password": "Неверный пароль.",
+                "auth/weak-password": "Пароль слишком слабый.",
+                "auth/too-many-requests": "Слишком много попыток. Попробуйте позже.",
+                "auth/operation-not-allowed": "В Firebase Console нужно включить Email/Password provider.",
+                "auth/network-request-failed": "Нет соединения с Firebase. Проверьте интернет."
+            };
+            return messages[error?.code] || error?.message || "Не удалось выполнить запрос авторизации.";
+        }
+
+        function clearAuthStorage() {
+            localStorage.removeItem("visbet_user");
+            localStorage.removeItem("visbet_session");
+            localStorage.removeItem("visbet_access_token");
+            localStorage.removeItem("visbet_refresh_token");
+        }
+
+        function validateForm() {
+            clearErrors();
+            showFeedback("");
+
+            const login = normalizeEmail($("email")?.value);
+            const password = $("password")?.value || "";
+            const isAdmin = authMode === "login" && login === "admin";
+            let valid = true;
+
+            if (!login) {
+                setFieldError("email-error", "Введите логин или email.");
+                valid = false;
+            } else if (!isAdmin && !isValidEmail(login)) {
+                setFieldError("email-error", "Email должен быть в формате name@example.com.");
+                valid = false;
+            }
+
+            if (!password) {
+                setFieldError("password-error", "Введите пароль.");
+                valid = false;
+            } else if (authMode === "register" && password.length < 8) {
+                setFieldError("password-error", "Пароль должен быть минимум 8 символов.");
+                valid = false;
+            }
+
+            if (authMode === "register") {
+                if (password !== ($("confirm-password")?.value || "")) {
+                    setFieldError("confirm-error", "Пароли не совпадают.");
+                    valid = false;
+                }
+                if (!$("accept-terms")?.checked) {
+                    setFieldError("terms-error", "Нужно принять условия использования.");
+                    valid = false;
                 }
             }
-        }
-        
-        checkCurrentSession();
 
-        // Удалить формочку если пользователь уже залогинен и не забанен
-        const savedUser = localStorage.getItem('visbet_user')?.trim();
-        if (savedUser) {
-            getDoc(doc(db, "users", savedUser)).then(snap => {
-                if (snap.exists() && !snap.data().isBanned) {
-                    location.href = 'index.html';
+            return valid;
+        }
+
+        async function getUserProfile(email, authUser = null) {
+            const userId = getUserDocId(email);
+            const ref = doc(db, "users", userId);
+            const snap = await getDoc(ref);
+
+            if (snap.exists()) {
+                const profile = snap.data();
+                if (authUser && profile.emailVerified !== authUser.emailVerified) {
+                    await updateDoc(ref, {
+                        emailVerified: authUser.emailVerified,
+                        authUid: authUser.uid,
+                        lastAuthSyncAt: new Date().toISOString()
+                    });
+                    profile.emailVerified = authUser.emailVerified;
+                    profile.authUid = authUser.uid;
                 }
+                return profile;
+            }
+
+            const nickname = `player_${String(authUser?.uid || Date.now()).slice(0, 6).toLowerCase()}`;
+            const profile = {
+                username: userId,
+                displayName: nickname,
+                nickname,
+                nicknameKey: nickname,
+                email,
+                authUid: authUser?.uid || null,
+                balance: WELCOME_BONUS,
+                welcomeBonusPending: true,
+                welcomeBonusAmount: WELCOME_BONUS,
+                welcomeBonusSeen: false,
+                role: "user",
+                isBanned: false,
+                emailVerified: Boolean(authUser?.emailVerified),
+                createdAt: new Date().toISOString(),
+                regDate: new Date().toISOString(),
+                authProvider: "firebase-auth"
+            };
+            await setDoc(ref, profile);
+            await setDoc(doc(db, "nicknames", nickname), {
+                userId,
+                nickname,
+                createdAt: new Date().toISOString()
+            });
+            return profile;
+        }
+
+        async function createSession(authUser, profileData) {
+            const email = normalizeEmail(authUser.email || profileData.email);
+            const userId = getUserDocId(email);
+            const accessToken = await authUser.getIdToken(true);
+            const tokenResult = await authUser.getIdTokenResult();
+            const session = {
+                provider: "firebase-auth",
+                userId,
+                username: profileData.username || userId,
+                displayName: profileData.nickname || profileData.displayName || email.split("@")[0],
+                email,
+                role: profileData.role || "user",
+                emailVerified: authUser.emailVerified,
+                balance: profileData.balance || 0,
+                accessToken,
+                refreshToken: authUser.refreshToken || "",
+                accessTokenExpiresAt: tokenResult.expirationTime,
+                issuedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem("visbet_user", userId);
+            localStorage.setItem("visbet_session", JSON.stringify(session));
+            localStorage.setItem("visbet_access_token", accessToken);
+            localStorage.setItem("visbet_refresh_token", authUser.refreshToken || "");
+
+            await updateDoc(doc(db, "users", userId), {
+                emailVerified: authUser.emailVerified,
+                lastLoginAt: new Date().toISOString(),
+                sessionUpdatedAt: new Date().toISOString()
             });
         }
+
+        async function sendVerification(user) {
+            if (!user) return;
+            await sendEmailVerification(user);
+            $("verification-text").textContent = `Письмо отправлено на ${user.email}. После подтверждения нажмите "Я подтвердил".`;
+            openVerificationModal();
+        }
+
+        function openVerificationModal() {
+            $("verification-panel").style.display = "grid";
+        }
+
+        function closeVerificationModal() {
+            $("verification-panel").style.display = "none";
+        }
+
+        function showBanScreen() {
+            $("auth-form").style.display = "none";
+            $("ban-overlay").style.display = "grid";
+        }
+
+        async function handleRegistration() {
+            const email = normalizeEmail($("email").value);
+            const password = $("password").value;
+            const credential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = credential.user;
+            const userId = getUserDocId(email);
+            const nickname = `player_${user.uid.slice(0, 6).toLowerCase()}`;
+
+            await setDoc(doc(db, "users", userId), {
+                username: userId,
+                displayName: nickname,
+                nickname,
+                nicknameKey: nickname,
+                email,
+                authUid: user.uid,
+                termsAccepted: true,
+                termsAcceptedAt: new Date().toISOString(),
+                balance: WELCOME_BONUS,
+                welcomeBonusPending: true,
+                welcomeBonusAmount: WELCOME_BONUS,
+                welcomeBonusSeen: false,
+                role: "user",
+                isBanned: false,
+                emailVerified: user.emailVerified,
+                createdAt: new Date().toISOString(),
+                regDate: new Date().toISOString(),
+                authProvider: "firebase-auth"
+            }, { merge: true });
+
+            await setDoc(doc(db, "nicknames", nickname), {
+                userId,
+                nickname,
+                createdAt: new Date().toISOString()
+            });
+
+            await sendVerification(user);
+            showFeedback("Аккаунт создан. Подтвердите email, чтобы войти на сайт.", "success");
+        }
+
+        async function handleLegacyAdminLogin(password) {
+            const snap = await getDoc(doc(db, "users", "Admin"));
+            if (!snap.exists() || snap.data().password !== password) {
+                throw new Error("Неверный логин или пароль администратора.");
+            }
+            const data = snap.data();
+            if (data.isBanned) {
+                showBanScreen();
+                return;
+            }
+            localStorage.setItem("visbet_user", "Admin");
+            localStorage.setItem("visbet_session", JSON.stringify({
+                provider: "legacy-admin",
+                userId: "Admin",
+                username: "Admin",
+                displayName: "Admin",
+                role: "admin",
+                balance: data.balance || 0,
+                issuedAt: new Date().toISOString()
+            }));
+            location.href = "index.html";
+        }
+
+        async function handleLogin() {
+            const login = normalizeEmail($("email").value);
+            const password = $("password").value;
+            await setPersistence(auth, $("remember-me")?.checked ? browserLocalPersistence : browserSessionPersistence);
+
+            if (login === "admin") {
+                await handleLegacyAdminLogin(password);
+                return;
+            }
+
+            const credential = await signInWithEmailAndPassword(auth, login, password);
+            await credential.user.reload();
+
+            if (!credential.user.emailVerified) {
+                await sendVerification(credential.user);
+                showFeedback("Email еще не подтвержден. Проверьте письмо и подтвердите вход.", "error");
+                return;
+            }
+
+            const profile = await getUserProfile(login, credential.user);
+            if (profile.isBanned) {
+                clearAuthStorage();
+                showBanScreen();
+                return;
+            }
+
+            await createSession(credential.user, profile);
+            location.href = "index.html";
+        }
+
+        function applyAuthModeState(mode) {
+            authMode = mode === "register" ? "register" : "login";
+            const isLogin = authMode === "login";
+            clearErrors();
+            showFeedback("");
+            closeVerificationModal();
+
+            document.querySelector(".auth-card").setAttribute("data-mode", authMode);
+            $("form-title").textContent = isLogin ? "Вход в аккаунт" : "Регистрация";
+            $("form-subtitle").textContent = isLogin ? "Добро пожаловать обратно!" : "Создайте аккаунт VISBET";
+            $("main-btn").querySelector("span").textContent = isLogin ? "Войти" : "Создать аккаунт";
+            $("switch-text").textContent = isLogin ? "Еще нет аккаунта?" : "Уже есть аккаунт?";
+            $("switch-mode").textContent = isLogin ? "Регистрация" : "Войти";
+            $("password").autocomplete = isLogin ? "current-password" : "new-password";
+            $("password").placeholder = isLogin ? "Пароль" : "Минимум 8 символов";
+            $("confirm-field").style.display = isLogin ? "none" : "grid";
+            $("password-meter").style.display = isLogin ? "none" : "block";
+            $("login-options").style.display = isLogin ? "" : "none";
+            $("terms-field").style.display = isLogin ? "none" : "grid";
+            $("terms-error").style.display = isLogin ? "none" : "block";
+            $("email").focus({ preventScroll: true });
+        }
+
+        $("login-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (!validateForm()) return;
+            setBusy(true);
+            try {
+                if (authMode === "login") {
+                    await handleLogin();
+                } else {
+                    await setPersistence(auth, browserLocalPersistence);
+                    await handleRegistration();
+                }
+            } catch (error) {
+                console.error(error);
+                showFeedback(mapAuthError(error), "error");
+            } finally {
+                setBusy(false);
+            }
+        });
+
+        $("switch-mode").addEventListener("click", () => {
+            applyAuthModeState(authMode === "login" ? "register" : "login");
+        });
+
+        $("password").addEventListener("input", () => {
+            const meter = $("password-meter").querySelector("span");
+            meter.style.width = `${passwordScore($("password").value)}%`;
+        });
+
+        $("password-toggle").addEventListener("click", () => {
+            const input = $("password");
+            const shouldShow = input.type === "password";
+            input.type = shouldShow ? "text" : "password";
+            $("password-toggle").setAttribute("aria-label", shouldShow ? "Скрыть пароль" : "Показать пароль");
+        });
+
+        $("forgot-button").addEventListener("click", async () => {
+            const email = normalizeEmail($("email").value);
+            if (!isValidEmail(email)) {
+                setFieldError("email-error", "Введите email, чтобы восстановить пароль.");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showFeedback("Письмо для восстановления пароля отправлено на email.", "success");
+            } catch (error) {
+                showFeedback(mapAuthError(error), "error");
+            }
+        });
+
+        $("alt-login-button").addEventListener("click", () => {
+            $("alt-login").classList.toggle("open");
+        });
+
+        document.querySelectorAll("[data-alt-message]").forEach((button) => {
+            button.addEventListener("click", () => {
+                $("alt-login").classList.remove("open");
+                showFeedback(button.dataset.altMessage);
+            });
+        });
+
+        $("terms-button").addEventListener("click", () => {
+            $("terms-modal").style.display = "grid";
+        });
+
+        $("terms-close").addEventListener("click", () => {
+            $("terms-modal").style.display = "none";
+        });
+
+        $("terms-modal").addEventListener("click", (event) => {
+            if (event.target === $("terms-modal")) $("terms-modal").style.display = "none";
+        });
+
+        $("verification-close").addEventListener("click", closeVerificationModal);
+
+        $("resend-verification").addEventListener("click", async () => {
+            try {
+                if (!auth.currentUser) {
+                    $("verification-text").textContent = "Сначала войдите или зарегистрируйтесь, чтобы отправить письмо повторно.";
+                    return;
+                }
+                await sendVerification(auth.currentUser);
+                $("verification-text").textContent = `Письмо подтверждения повторно отправлено на ${auth.currentUser.email}.`;
+            } catch (error) {
+                $("verification-text").textContent = mapAuthError(error);
+            }
+        });
+
+        $("check-verification").addEventListener("click", async () => {
+            try {
+                if (!auth.currentUser) {
+                    $("verification-text").textContent = "Сессия Firebase не найдена. Войдите еще раз после подтверждения email.";
+                    return;
+                }
+                await auth.currentUser.reload();
+                if (!auth.currentUser.emailVerified) {
+                    $("verification-text").textContent = "Email пока не подтвержден. Проверьте письмо и нажмите кнопку еще раз.";
+                    return;
+                }
+                const profile = await getUserProfile(auth.currentUser.email, auth.currentUser);
+                await createSession(auth.currentUser, profile);
+                location.href = "index.html";
+            } catch (error) {
+                $("verification-text").textContent = mapAuthError(error);
+            }
+        });
+
+        $("clear-ban-button").addEventListener("click", async () => {
+            clearAuthStorage();
+            try { await signOut(auth); } catch (error) {}
+            $("ban-overlay").style.display = "none";
+            $("auth-form").style.display = "grid";
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            $("terms-modal").style.display = "none";
+            $("verification-panel").style.display = "none";
+            $("alt-login").classList.remove("open");
+        });
+
+        async function checkCurrentSession() {
+            const savedUser = localStorage.getItem("visbet_user")?.trim();
+            if (!savedUser) return;
+            try {
+                const snap = await getDoc(doc(db, "users", savedUser));
+                if (snap.exists() && snap.data().isBanned) {
+                    showBanScreen();
+                    return;
+                }
+                if (snap.exists()) {
+                    location.replace("index.html");
+                    return;
+                }
+                clearAuthStorage();
+            } catch (error) {
+                console.warn("Session check failed:", error);
+            }
+        }
+
+        applyAuthModeState("login");
+        checkCurrentSession();
     </script>
 </body>
 </html>

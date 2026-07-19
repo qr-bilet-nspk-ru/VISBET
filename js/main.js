@@ -5,12 +5,26 @@
 
 let selectedOutcomes = []; // Выбранные ставки
 let currentFilter = 'Все';
+let sportsData = []; // Данные матчей
+let renderEventsTimeout = null; // Для дебаунса renderEvents
+
+// --- Управление экраном загрузки ---
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+        }, 3200);
+    }
+}
 
 // --- Инициализация при загрузке ---
 document.addEventListener('DOMContentLoaded', () => {
+    hideLoadingScreen();
+    loadSportsData();
     renderEvents();
     checkAuth();
-    
+
     // Запуск Realtime-симуляции (изменение коэффициентов и статусов)
     startRealtimeEngine();
 
@@ -22,6 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize mobile touch support
     initializeMobileSupport();
 });
+
+// --- Загрузка данных матчей ---
+function loadSportsData() {
+    // Сначала пытаемся загрузить из localStorage (синхронизировано с админкой)
+    let storedData = localStorage.getItem('visbet_main_events');
+    if (storedData) {
+        sportsData = JSON.parse(storedData);
+    } else {
+        sportsData = [];
+    }
+}
 
 // --- Mobile Touch Support ---
 function initializeMobileSupport() {
@@ -95,63 +120,76 @@ function handleSwipe() {
     }
 }
 
-// --- 1. Realtime & Live Engine ---
+// --- 1. Realtime & Live Engine (Optimized) ---
 function startRealtimeEngine() {
+    let updateCounter = 0;
     setInterval(() => {
+        // Обновляем данные реже для лучшей производительности
+        updateCounter++;
+        let dataChanged = false;
+        
         sportsData.forEach(match => {
-            // 1. Симуляция счета для LIVE матчей
-            if (match.isLive && Math.random() > 0.95) {
+            // 1. Симуляция счета для LIVE матчей (реже)
+            if (match.isLive && updateCounter % 3 === 0 && Math.random() > 0.95) {
                 match.score.home += (Math.random() > 0.5 ? 1 : 0);
                 match.score.away += (Math.random() > 0.7 ? 1 : 0);
+                dataChanged = true;
             }
 
-            // 2. Симуляция изменения коэффициентов
-            match.markets.forEach(market => {
-                market.outcomes.forEach(o => {
-                    // Рандомное изменение кф на +/- 0.01-0.05
-                    if (Math.random() > 0.8) {
-                        const change = (Math.random() * 0.1 - 0.05);
-                        o.odd = Math.max(1.01, parseFloat((o.odd + change).toFixed(2)));
-                    }
+            // 2. Симуляция изменения коэффициентов (реже для живых)
+            if (updateCounter % 2 === 0 && Math.random() > 0.85) {
+                match.markets.forEach(market => {
+                    market.outcomes.forEach(o => {
+                        if (Math.random() > 0.82) {
+                            const change = (Math.random() * 0.08 - 0.04);
+                            o.odd = Math.max(1.01, parseFloat((o.odd + change).toFixed(2)));
+                            dataChanged = true;
+                        }
+                    });
                 });
-            });
+            }
 
-            // 3. Симуляция блокировки (Locked)
-            // Если в LIVE происходит опасный момент, блокируем ставки
-            if (match.isLive) {
-                match.isLocked = Math.random() > 0.9; 
+            // 3. Симуляция блокировки (Locked) - реже
+            if (match.isLive && updateCounter % 4 === 0) {
+                match.isLocked = Math.random() > 0.92; 
             }
         });
 
-        // Частичное обновление интерфейса без полной перерисовки (если не открыты детали)
-        const detailsOpen = document.querySelector('.details-view');
-        if (!detailsOpen) {
-            renderEvents();
-        } else {
-            // Если открыты детали, можно обновлять только их (по желанию)
-            updateLiveIndicators(); 
+        // Обновляем интерфейс только если данные изменились
+        if (dataChanged) {
+            const detailsOpen = document.querySelector('.details-view');
+            if (!detailsOpen) {
+                debouncedRenderEvents(); // Используем дебаунс
+            }
+            syncCouponOdds();
         }
-        
-        // Синхронизация купона, если коэффициенты изменились
-        syncCouponOdds();
-    }, 3000); // Обновление каждые 3 секунды
+    }, 4000); // Обновление каждые 4 секунды вместо 3
 }
 
-// Обновление кф в купоне, если они изменились в базе данных
+// Обновление кф в купоне, если они изменились в базе данных (Optimized)
 function syncCouponOdds() {
+    if (selectedOutcomes.length === 0) return; // Ранний выход для пустого купона
+    
     let changed = false;
-    selectedOutcomes.forEach(selected => {
-        const match = sportsData.find(m => m.id === selected.matchId);
-        if (match) {
-            match.markets.forEach(m => {
-                const actualOutcome = m.outcomes.find(o => o.label === selected.outcomeLabel);
-                if (actualOutcome && actualOutcome.odd !== selected.odd) {
-                    selected.odd = actualOutcome.odd;
-                    changed = true;
-                }
-            });
+    
+    // Используем Map для быстрого поиска матчей
+    const matchMap = new Map(sportsData.map(m => [m.id, m]));
+    
+    for (let selected of selectedOutcomes) {
+        const match = matchMap.get(selected.matchId);
+        if (!match) continue;
+        
+        // Ищем коэффициент в рынках
+        for (let market of match.markets) {
+            const actualOutcome = market.outcomes.find(o => o.label === selected.outcomeLabel);
+            if (actualOutcome && Math.abs(actualOutcome.odd - selected.odd) > 0.001) {
+                selected.odd = actualOutcome.odd;
+                changed = true;
+                break; // Выход из рынков если нашли
+            }
         }
-    });
+    }
+    
     if (changed) updateCouponUI();
 }
 
@@ -186,7 +224,17 @@ function filterSport(name) {
     renderEvents();
 }
 
-// --- 3. Рендеринг событий ---
+// --- 3. Рендеринг событий (с дебаунсом) ---
+function debouncedRenderEvents() {
+    if (renderEventsTimeout) {
+        clearTimeout(renderEventsTimeout);
+    }
+    renderEventsTimeout = setTimeout(() => {
+        renderEvents();
+        renderEventsTimeout = null;
+    }, 300); // Ждем 300ms перед рендерингом для группировки обновлений
+}
+
 function renderEvents() {
     const container = document.getElementById('eventsContainer');
     if (!container) return;
@@ -221,7 +269,7 @@ function renderEvents() {
                         ${previewMarket.outcomes.map(o => `
                             <button class="odd-box" 
                                 ${match.isLocked ? 'disabled' : ''} 
-                                onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
+                                onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd}, '${previewMarket.name}')">
                                 <span class="label">${o.label}</span>
                                 <span class="val">${o.odd}</span>
                             </button>
@@ -262,7 +310,7 @@ function openMatchDetails(matchId) {
                             ${market.outcomes.map(o => `
                                 <button class="odd-box" 
                                     ${match.isLocked ? 'disabled' : ''} 
-                                    onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd})">
+                                    onclick="addToCoupon(${match.id}, '${match.teams.home}-${match.teams.away}', '${o.label}', ${o.odd}, '${market.name}')">
                                     <span class="label">${o.label}</span>
                                     <span class="val">${o.odd}</span>
                                 </button>
@@ -380,7 +428,7 @@ function startCountdown(matchId, matchTime) {
 }
 
 // --- 4. Детальная роспись ---
-function addToCoupon(matchId, matchName, outcomeLabel, odd) {
+function addToCoupon(matchId, matchName, outcomeLabel, odd, market) {
     const match = sportsData.find(m => m.id === matchId);
     if (match && match.isLocked) {
         alert("Извините, прием ставок на это событие временно заблокирован.");
@@ -392,7 +440,7 @@ function addToCoupon(matchId, matchName, outcomeLabel, odd) {
         return;
     }
 
-    selectedOutcomes.push({ matchId, matchName, outcomeLabel, odd });
+    selectedOutcomes.push({ matchId, matchName, outcomeLabel, odd, market });
     updateCouponUI();
 }
 
@@ -418,7 +466,7 @@ function updateCouponUI() {
         <div class="coupon-item animation-fade">
             <div class="ci-top">
                 <strong>${item.matchName}</strong>
-                <button onclick="removeFromCoupon(${item.matchId})">✕</button>
+                <button class="remove-btn" onclick="removeFromCoupon(${item.matchId})">✕</button>
             </div>
             <div class="ci-bottom">
                 <span>${item.outcomeLabel}</span>

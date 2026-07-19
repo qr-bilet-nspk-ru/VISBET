@@ -8,6 +8,10 @@
     <meta name="apple-mobile-web-app-title" content="VisBET Профиль">
     <meta name="theme-color" content="#0b0e11">
     <title>Профиль | VisBET</title>
+    <script>
+        window.location.replace('index.html?tab=profile');
+    </script>
+    <script src="js/theme.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .profile-shell { max-width: 1240px; margin: 0 auto; padding: 24px; }
@@ -17,26 +21,26 @@
             gap: 18px;
             margin-bottom: 18px;
         }
-        .profile-name { font-size: 34px; font-weight: 950; line-height: 1; margin-top: 8px; }
-        .profile-balance { font-size: 38px; font-weight: 950; color: var(--turquoise); margin-top: 10px; }
+        .profile-name { font-size: 34px; font-weight: 700; line-height: 1; margin-top: 8px; color: var(--text-dark); }
+        .profile-balance { font-size: 38px; font-weight: 700; color: var(--accent-blue); margin-top: 10px; }
         .profile-grid { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
         .history-list { display: grid; gap: 12px; }
         .profile-bet {
             padding: 16px;
-            border-radius: var(--radius);
-            background: rgba(255,255,255,0.045);
-            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-lg);
+            background: #FFFFFF;
+            border: 1px solid var(--border-light);
         }
         .ledger-item {
             display: flex;
             justify-content: space-between;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-bottom: 1px solid var(--border-light);
         }
         .ledger-item:last-child { border-bottom: 0; }
-        .amount-plus { color: var(--success); font-weight: 900; }
-        .amount-minus { color: #ff7777; font-weight: 900; }
+        .amount-plus { color: var(--accent-green); font-weight: 700; }
+        .amount-minus { color: var(--accent-pink); font-weight: 700; }
 
         /* Tablet optimization */
         @media (max-width: 1024px) {
@@ -75,7 +79,7 @@
         }
     </style>
 </head>
-<body>
+<body class="visbet-public-bg">
     <header class="header">
         <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">Vis<span>BET</span></div>
         <nav class="top-nav" style="display:flex; gap:10px; margin-left:20px;">
@@ -84,9 +88,17 @@
             <button class="nav-link" onclick="location.href='admin.html'" id="profile-admin-link" style="display:none;">Админка</button>
         </nav>
         <div style="display:flex; gap:10px; align-items:center;">
+            <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+                <span class="theme-toggle-icon" data-theme-icon>☾</span>
+                <span data-theme-label>Темная</span>
+            </button>
             <div id="auth-zone" class="user-info"></div>
         </div>
     </header>
+
+    <button class="theme-floating-toggle" type="button" data-theme-toggle aria-pressed="false">
+        <span data-theme-icon>☾</span>
+    </button>
 
     <main class="profile-shell">
         <section class="profile-hero">
@@ -112,7 +124,7 @@
                 <div style="color: var(--text-muted);">Все важные операции под рукой.</div>
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="vb-btn secondary" onclick="location.href='register.html'">Пополнить</button>
+                <button class="vb-btn secondary" onclick="location.href='index.html?tab=deposit'">Пополнить</button>
                 <button class="vb-btn" onclick="location.href='index.html'">Линия</button>
                 <button class="vb-btn" onclick="location.href='index.html?tab=history'">История</button>
             </div>
@@ -284,7 +296,10 @@
 
         window.logoutProfile = () => {
             localStorage.removeItem('visbet_user');
-            location.href = 'index.html';
+            localStorage.removeItem('visbet_session');
+            localStorage.removeItem('visbet_access_token');
+            localStorage.removeItem('visbet_refresh_token');
+            location.href = 'register.html';
         };
 
         window.renderProfile = () => {
@@ -307,7 +322,7 @@
             const roi = totalStake > 0 ? ((profit / totalStake) * 100).toFixed(1) : '0.0';
 
             document.getElementById('profile-name').innerText = currentUser.username;
-            document.getElementById('profile-meta').innerText = `Роль: ${currentUser.role || 'user'} | Ставок: ${profileBets.length}`;
+            document.getElementById('profile-meta').innerText = `| Ставок: ${profileBets.length}`;
             document.getElementById('profile-balance').innerText = formatMoney(currentUser.balance);
             document.getElementById('profile-roi').innerText = `${roi}%`;
             document.getElementById('profile-stats').innerHTML = `
